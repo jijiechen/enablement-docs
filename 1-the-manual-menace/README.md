@@ -1,39 +1,38 @@
-# The Manual Menace
-> In this exercise learners will use Ansible to drive automated provisioning of Projects in OpenShift, Git, Jenkins and Nexus.
+# 手工操作的威胁
+> 在这个练习环节，学员将利用 Ansible 自动地完成 OpenShift 项目、Git、Jenkins 和 Nexus 的部署。
 
 ![automation-xkcd](https://imgs.xkcd.com/comics/automation.png)
 [image-ref](https://xkcd.com/)
 
-## Exercise Intro
-In this exercise we will use automation tooling to create Project namespaces for our `CI/CD` tooling along with the `dev` and `test` namespaces for our deployments to live. We do this manually using the OpenShift CLI; but as we go from cluster to cluster or project to project Dev and Ops teams often find themselves having to redo these tasks again and again. Configuring our cluster using code; we can easily store this in Git and repeat the process again and again. By minimising the time taken to do these repetitive tasks we can accelerate our ability to deliver value to our customers; working on the hard problems they face.
+## 练习简介
+在这个练习中，我们将使用自动化工具创建 `CI/CD` 工具，以及 `dev` 和 `test` 等项目所需的命名空间，我们后面的部署工作将用到它们。我们借助 OpenShift 命令行工具（CLI）手动地完成这些工作；不过，在我们在不同的集群之间、不同的项目之间切换过程中，Dev 团队和 Ops 团队常常发现这些操作经常会一遍遍地重复。通过以代码的方式配置集群，我们可以很方便地将它们记录在 Git 中，并轻松地再次运行。当在这些重复的工作上花的时间减少，我们就可以提高给客户、用户创造价值的能力，关注他们复杂的需求。
+在这个练习环节，学员将利用 Ansible 创建集群上的资源。具体来说，我们用到的是一个叫做 [OpenShift-Applier](https://github.com/redhat-cop/openshift-applier) 的工具。在项目的命名空间创建完成之后，我们将会向其中添加更多用于支持 CI/CD 的工具，比如 Jenkins、Git 和 Nexus。在后续的课程中，我们的自动构建和自动部署的过程会需要用到这些工具。此外，这一过程中，我们用 Ansible 操作 OpenShift 模板来完成它们的创建。为了验证整个机制工作良好，我们最后会将所有创建的资源全部删除，通过再次运行 Ansible 脚本来重新创建集群上的资源。
 
-This exercise uses Ansible to drive the creation of the cluster content. In particular; we'll use an implementation called the [OpenShift Applier](https://github.com/redhat-cop/openshift-applier). Once the project namespace have been created; we will add some tools to support CI/CD such as Jenkins, Git and Nexus. These tools will be needed by later lessons to automate the build and deploy of our apps. Again; we will use OpenShift Templates and drive their creation in the cluster using Ansible. To prove things are working, finally we'll delete all our content and re-apply the inventory to re-create our cluster's content.
-
-#### Why is config-as-code important?
-* Assurance - Prevents unwanted config changes from people making arbitrary changes to environments. No more Snowflake servers!
-* Traceability - Committing config as code means a user has approved and changes can be tracked.
-* Phoenix Server -  Burn it all to the ground and bring it back; exactly the way it was!
+#### 为什么“配置即代码”如此重要？
+* 保障 - 防止由于人们无意或随意变更导致的环境配置被意外变更的情况。与雪花服务器说再见！
+* 可跟踪 - 以代码的方式描述的配置提交变更时，即意味着用户已被授权，同时这些变更可以跟踪。
+* 凤凰服务器 - 将整个环境完全销毁，并重新创建——完全按照原来的样子！
 
 _____
 
-## Learning Outcomes
-As a learner you will be able to
+## 学员收获
+作为学员，你将能够：
 
-1. Run the [openshift-applier](https://github.com/redhat-cop/openshift-applier) to automate creating cluster content
-1. Create and admin project namespaces in OpenShift
-1. Deploy commonly used applications to support the development process
+1. 运用 [openshift-applier](https://github.com/redhat-cop/openshift-applier) 自动化地创建集群中的资源
+2. 使用 OpenShift 创建并管理项目命名空间
+3. 部署用于支持开发流程的常用软件
 
-## Tools and Frameworks
+## 工具和框架
 
-* [GitLab](https://about.gitlab.com/) - Community driven Git server now with integrated DevOps Toolchain.
-* [Nexus](https://www.sonatype.com/nexus-repository-sonatype) - Repository manager for storing lots of application types. Can also host `npm` and `Docker` registries.
-* [Jenkins](https://jenkins.io/) - OpenSource Build automation server. Highly customisable with plugins.
-* [Ansible](https://www.ansible.com/) - IT Automation tool used to provision and manage state of cloud and physical infrastructure.
-* [OpenShift Applier](https://github.com/redhat-cop/openshift-applier) - Used to apply OpenShift objects to an OpenShift Cluster.
-* [Eclipse Che](https://www.eclipse.org/che/) - A cloud ide accessible from your browser, we use a version called [`CodeReady Workspaces`](https://developers.redhat.com/products/codeready-workspaces/overview)
+* [GitLab](https://about.gitlab.com/) - 开源的 Git 服务器，现在还集成了一些 DevOps 工具链。
+* [Nexus](https://www.sonatype.com/nexus-repository-sonatype) - 可存储各种类型应用的仓储管理软件。也可以认为是 `npm` 和 `Docker` 仓库。
+* [Jenkins](https://jenkins.io/) - 开源的构建自动化服务器。可以借助丰富的插件实现高度定制化。
+* [Ansible](https://www.ansible.com/) - 可用于部署和管理云和物理基础设施的 IT 自动化工具。
+* [OpenShift Applier](https://github.com/redhat-cop/openshift-applier) - 用于向 OpenShift 集群创建 OpenShift 资源的工具
+* [Eclipse Che](https://www.eclipse.org/che/) - 一个可以从浏览器访问的云端 IDE，我们使用的版本为 [`CodeReady Workspaces`](https://developers.redhat.com/products/codeready-workspaces/overview)
 
-## Big Picture
-> The Big Picture is our emerging architecture; starting with an empty cluster we populate it with projects and some ci/cd tooling.
+## 全景图
+> 全景图指的是我们的架构演进图。从一个空的集群开始，我们逐步向其中添加各个项目，以及 CI/CD 工具链。
 
 ![big-picture](../images/big-picture/big-picture-1.jpg)
 _____
@@ -59,49 +58,49 @@ If you're feeling confident and don't want to follow the step-by-step guide thes
 6. Burn it all down and re-apply your inventory proving config-as-code works.
 -->
 
-## Step by Step Instructions
+## 操作步骤
 <!-- > This is a structured guide with references to exact filenames and explanations.  -->
 
-### Part 1 - Create your cloud workspace
-> _Create your cloud ide environment using Che_
+### 第 1 部分 - 创建云端工作空间
+> _使用 Che 创建云端 IDE 环境_
 
-1. To create your cloud ide environment, open a web browser using the following URL:
+1. 要创建云端 IDE 环境，请打开一个浏览器，并访问以下 URL（“神奇链接”）：
 
 ```
 https://codeready-workspaces.apps.<DOMAIN_FOR_YOUR_CLASS>/dashboard/#/load-factory?name=DO500%20Template&user=admin
 ```
 
 <p class="tip">
-<b>NOTE</b> - Complete URL should be replaced with the one you've been provided by the instructor.
+<b>提示</b> - 请使用讲师向你提供的真实、完整的 URL。
 </p>
 
-2. Login using the `OpenShift 3` button using your credentials
+2. 请使用右边 `OpenShift 3` 按钮登录
 
 ![code-ready-workspaces](../images/exercise1/code-ready-workspaces.png)
 
-3. You should see your workspace creating
+3. 你应该能看到，工作空间开始创建
 
 ![che-workspace-create](../images/exercise1/che-workspace-create.png)
 
-4. And finally your cloud ide should be ready
+4. 最后，云端 IDE 创建完成
 
 ![che-workspace-done](../images/exercise1/che-workspace-done.png)
 
-### Part 2 - Create OpenShift Projects
-> _Using the OpenShift Applier, we will add new project namespaces to the cluster which will be used throughout the exercise._
+### 第 2 部分 - 创建 OpenShift 项目
+> _使用 OpenShift Applier, 我们将会在集群中创建新的命名空间（项目），在后面的练习中会持续用到这些命名空间。_
 
-1. In this course two different git projects will be created. Select `Terminal > Run Task` in your cloud ide.
+1. 在这个课程的过程中，我们会创建两个不同的 Git 项目。请在云端环境中选择 `Terminal > Run Task` 菜单。
 
 <p class="tip">
-⛷️ <b>NOTE</b> ⛷️ - If you do not plan on using the cloud ide you can clone the repository locally from here https://github.com/rht-labs/enablement-ci-cd
+⛷️ <b>提示</b> ⛷️ - 如果你不计划使用云端 IDE，也可以把代码克隆到本地：https://github.com/rht-labs/enablement-ci-cd
 </p>
 
-2. Run the `che: init-ci-cd` task in your `dev-pod/main` container to clone the `enablement-ci-cd` code into `/projects` directory
+2. 在 `dev-pod/main` 容器中运行 `che: init-ci-cd` 任务，即可将 `enablement-ci-cd` 的代码克隆到 `/projects` 目录：
 
 ![init-code1](../images/exercise1/init-code1.png)
 ![init-code1-complete](../images/exercise1/init-code1-complete.png)
 
-3. Open the `enablement-ci-cd` folder in your cloud ide (or your favourite editor if using a local machine). The project is laid out as follows
+3. 在云端 IDE 中打开 `enablement-ci-cd` 文件夹（或者，在本地机器上用你喜欢的编辑器打开），可以看到如下所示的项目结构：
 ```
 .
 ├── README.md
@@ -119,24 +118,24 @@ https://codeready-workspaces.apps.<DOMAIN_FOR_YOUR_CLASS>/dashboard/#/load-facto
 └── templates
     └── project-requests.yml
 ```
- * `docker` folder contains sample Dockerfiles for our jenkins-slave images that will be used by the builds.
- * `jenkins-s2i` contains the configuration and plugins we want to bring jenkins to life with
- * `params` houses the variables we will load the templates with
- * `templates` is a collection of OpenShift Container Platform templates
- * `inventory/*.yml` is the ansible inventory used to manage the objects and content for the OpenShift cluster
- * `requirements.yml` is a manifest which contains the ansible modules needed to run the playbook
- * `apply.yml` is a playbook that sets up some variables and runs the OpenShift Applier role.
+ * `docker` 文件夹包含一些示例的 Dockerfile，在后续的构建 jenkins-slave 镜像的过程中会用到
+ * `jenkins-s2i` 包含用于定制 Jenkins 在首次启动时就准备好的插件及配置信息
+ * `params` 放置在加载模板时需要使用的变量
+ * `templates` 是一系列 OpenShift 容器平台（OCP）资源的模板
+ * `inventory/*.yml` 是 Ansible 主机清单（Inventory）文件，用于管理 OpenShift 集群的对象和资源
+ * `requirements.yml` 包含运行 Ansible 剧本（Playbook）时所需的模块
+ * `apply.yml` 是负责配置变量，并运行 OpenShift Applier 角色的剧本
 
-4. Open the `inventory/groups_vars/all.yml` file. Update the `namespace_prefix` variables by replacing the `<YOUR_NAME>` (including the `<` and `>`) with your name or initials. **Don't use uppercase or special characters**. For example; if your name is Tim Smith you would replace `<YOUR_NAME>` and set `namespace_prefix` to something like `tim` or `tsmith`.
+4. 打开文件 `inventory/groups_vars/all.yml`，更改变量 `namespace_prefix`：将其中的 `<YOUR_NAME>`（包括 `<` 和 `>`）替换为讲师提供的名称或你的名字的缩写。**请不要使用大写字母或特殊字符。**比如，如果你名字的拼音是 Zhang Hongjie，你可以把 `namespace_prefix` 中的 `<YOUR_NAME>` 替换为 `hongjie` or `zhhj`。
 
 <kbd>📝 *enablement-ci-cd/inventory/groups_vars/all.yml*</kbd>
 ```yaml
   namespace_prefix: "<YOUR_NAME>"
 ```
 
-5. Open the `inventory/host_vars/projects-and-policies.yml` file; you should see some variables setup already to create the `<YOUR_NAME>-ci-cd` namespace. This object is passed to the OpenShift Applier to call the `templates/project-requests.yml` template with the parameters composed from the inventory and the `ci_cd` vars in the `apply.yml` playbook. We will add some additional content here but first let's explore the parameters and the template
+5. 打开文件 `inventory/host_vars/projects-and-policies.yml`，你将能看到一些已经设置好的变量，它们将用来创建 `<YOUR_NAME>-ci-cd` 命名空间。它将会被传给 OpenShift Applier，并与来自主机清单和 `apply.yml` 剧本中 `ci_cd` 中的变量一起用于调用 `templates/project-requests.yml` 模板。我们后面会在这里继续添加一些内容，不过目前我们先了解一下这些参数和模板。
 
-6. Inside of the `inventory/host_vars/projects-and-policies.yml` you'll see the following
+6. 在文件 `inventory/host_vars/projects-and-policies.yml` 之中，你可以看到如下内容：
 
 <kbd>📝 *enablement-ci-cd/inventory/host_vars/projects-and-policies.yml*</kbd>
 ```yaml
@@ -145,7 +144,7 @@ https://codeready-workspaces.apps.<DOMAIN_FOR_YOUR_CLASS>/dashboard/#/load-facto
     NAMESPACE_DISPLAY_NAME: "{{ namespace_prefix | title }}s CI/CD"
 ```
 
- * This will define the variables that we'll soon be using to deploy our CI/CD project. It relies on the `namespace_prefix` that we updated earlier. Pulling these two sets of variables together will now allow us to pass the newly created variables to our template that will create our project appropriately. You'll notice that the name of the variable above (`ci_cd`) is then assigned to `params_from_vars` in our inventory.
+ * 它定义了我们很快在部署 CI/CD 项目时所使用的变量。它依赖上面我们更新过的 `namespace_prefix` 变量。这两组变量组合起来之后，我们现在就可以将它们传给用于创建项目的模板了。你可以注意到，上面的变量的名称（即 `ci_cd`）很快就由主机清单中的 `params_from_vars` 所使用。
 
 <kbd>📝 *enablement-ci-cd/inventory/host_vars/projects-and-policies.yml*</kbd>
 ```yaml
@@ -161,11 +160,12 @@ https://codeready-workspaces.apps.<DOMAIN_FOR_YOUR_CLASS>/dashboard/#/load-facto
       - projects
 ```
 
-7. Let's add two more params dicts to pass to our template to be able to create a `dev` and `test` project. At the top of `enablement-ci-cd/inventory/host_vars/projects-and-policies.yml` create a dictionary called `dev` and `test` similar to how you see `ci_cd` defined.
+7. 接下来我们向其中添加两个新的参数字典，它们传给模板之后，就可以用于创建 `dev` 和 `test` 项目了。在文件 `enablement-ci-cd/inventory/host_vars/projects-and-policies.yml` 的顶部，请使用与现有的 `ci_cd` 类似的内容创建新的字典对象 `dev` 和 `test`。
 
- * In your editor, open `enablement-ci-cd/inventory/host_vars/projects-and-policies.yml` and add the following lines before `openshift_cluster_content`:
+ * 在编辑器中, 打开 `enablement-ci-cd/inventory/host_vars/projects-and-policies.yml` 并在 `openshift_cluster_content` 之前添加如下行:
 
 <kbd>📝 *enablement-ci-cd/inventory/host_vars/projects-and-policies.yml*</kbd>
+
 ```yaml
 dev:
   NAMESPACE: "{{ namespace_prefix }}-dev"
@@ -176,7 +176,7 @@ test:
   NAMESPACE_DISPLAY_NAME: "{{ namespace_prefix | title }} Test"
 ```
 
-8. In the `enablement-ci-cd/inventory/host_vars/projects-and-policies.yml` file, add the new objects for the projects you want to create (dev & test) by adding another object to the `content` array (previously defined) for each. You can copy and paste them from the `ci_cd_namespace` example and update them accordingly. If you do this, remember to set the names to `{{ dev_namespace }}` and `{{ test_namespace }}` and change the `params_from_vars` variable accordingly. The values for these variables used for the names (`ci_cd_namespace`, `dev_namespace` etc.) are defined in `apply.yml` file in the root of the project.
+8. 在文件 `enablement-ci-cd/inventory/host_vars/projects-and-policies.yml` 中，针对要创建的新项目（即 dev 和 test），向已经存在的 `content` 数组中分别添加它们对应的对象。可以直接从示例的 `ci_cd_namespace` 复制，然后做一些必要的修改即可。如果你复制，请确保记得将名称设置为 `{{ dev_namespace }}` 和 `{{ test_namespace }}`，并且对应地修改 `params_from_vars`。`ci_cd_namespace`、`dev_namespace` 这些名称中变量的值是在项目根目录的 `apply.yml` 文件中定义的。
 
 <kbd>📝 *enablement-ci-cd/inventory/host_vars/projects-and-policies.yml*</kbd>
 ```yaml
@@ -194,31 +194,31 @@ test:
     - projects
 ```
 
-9. Use the `Terminal > Open Terminal in specific container` menu item to open a terminal in the `dev-pod/main` container
+9. 请使用 `Terminal > Open Terminal in specific container` 菜单项，在 `dev-pod/main` 容器中打开一个控制台。
 
 ![open-terminal](../images/exercise1/open-terminal.png)
 
 <p class="tip">
-<b>NOTE</b> - If you want to try <b>z shell</b> as your default in the cloud ide run this command
+<b>提示</b> - 如果你使用 <b>z shell</b> 作为默认控制台，请执行此命令：
 </p>
 
 ```
 echo "zsh" >> ~/.bashrc
 ```
 
-10.   Change to the `enablement-ci-cd` directory
+10.  切换到 `enablement-ci-cd` 目录
 
 ```bash
 cd enablement-ci-cd
 ```
 
-11. With the configuration in place, install the OpenShift Applier dependency
+11. 在上述所有配置完成之后，就可以安装 OpenShift Applier 依赖项了
 
 ```bash
 ansible-galaxy install -r requirements.yml --roles-path=roles
 ```
 
-12. Apply the inventory by logging into OpenShift on the terminal and running the playbook as follows (`<CLUSTER_URL>` should be replaced with the one you've been provided by the instructor). Accept any insecure connection warning(s) 👍:
+12.  在控制台中登录 OpenShift，然后按下面的方式，在主机清单上执行 Ansible 剧本（把其中的 `<CLUSTER_URL>` 替换为讲师指定的值），如果出现了安全警告，请选择接受 👍：
 
 ```bash
 oc login <CLUSTER_URL>
@@ -227,11 +227,13 @@ oc login <CLUSTER_URL>
 ansible-playbook apply.yml -i inventory/ -e target=bootstrap
 ```
 
-where the `-e target=bootstrap` is passing an additional variable specifying that we run the `bootstrap` group of the inventory.
+其中的 `-e target=bootstrap` 用于传入一个额外变量，它指出我们的剧本应该在分组为 `bootstrap` 的主机清单上运行。
 
-13. Once successful you should see an output similar to this: ![playbook-success](../images/exercise1/play-book-success.png)
+13.  成功之后，你应该能看到类似于这样的输出：
 
-14. You can check to see the projects have been created successfully by running
+![playbook-success](../images/exercise1/play-book-success.png)
+
+13. 可以通过运行下面的命令来查看成功创建的项目
 
 ```bash
 oc projects
@@ -239,7 +241,7 @@ oc projects
 
 ![project-success](../images/exercise1/project-success.png)
 
-### Part 3 - Nexus
+### 第 3 部分 - Nexus
 > _Now that we have our Projects setup; we can start to populate them with Apps to be used in our dev lifecycle_
 
 For this part, we will use an OpenShift Container Platform **template** to install and configure Nexus. This template contains all the things needed to set up a persistent Nexus server, exposing a service and route while also creating the persistent volume needed. Have a read through the template; at the bottom you'll see a collection of parameters we will pass to the template.
