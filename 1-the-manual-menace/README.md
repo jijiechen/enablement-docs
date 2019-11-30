@@ -295,18 +295,18 @@ ansible-playbook apply.yml -e target=tools \
      -e "filter_tags=nexus"
 ```
 
-5. 成功之后，从浏览器登录集群（使用集群 URL），并切换到 `<YOUR_NAME>-ci-cd` 项目。你应该能看到 Nexus 已经成功启动。你可以使用默认的身份信息进行登录（admin / admin123）
+5. 成功之后，从浏览器登录集群（使用集群 URL），并切换到 `<YOUR_NAME>-ci-cd` 项目。你应该能看到 Nexus 已经成功启动。你可以使用默认的用户名和密码进行登录（admin / admin123）
 ![nexus-up-and-running](../images/exercise1/nexus-up-and-running.png)
 
 ### 第 4 部分 - 提交 CI/CD
 
-1. Navigate to GitLab login page. You can login using your cluster credentials using the LDAP tab
+1. 打开 GitLab 登录页面。你可以在 LDAP 标签使用集群的用户名和密码登录。
 ![gitlab-ui](../images/exercise1/gitlab-ui.png)
 
-2. Once logged in create a new project called `enablement-ci-cd` and mark it as internal. Once created, copy out the `git url` for use on the next step.
+2. 登录完成后，创建一个名为 `enablement-ci-cd` 的新项目，并将其可见级别设置为 `Internal`。创建完成后，在下一页将其 `git url` 复制出来备用。
 ![gitlab-new-project](../images/exercise1/gitlab-new-project.png)
 
-3. Commit your local project to this new remote by first removing the existing origin (github) where the Ansible project was cloned from in the first steps. Remember to substitute `<GIT_URL>` accordingly with the one created for your `enablement-ci-cd` repository a moment ago.
+1. 把本地项目，通过先移除在第一步中克隆 Ansible 项目时所使用的 GitHub 远端，即可提交到这个新的 Git 服务器。在下面的命令中，不要忘记将 `<GIT_URL>` 替换为你刚才创建的 `enablement-ci-cd` 仓库的 `git url`。
 ```bash
 git remote set-url origin <GIT_URL>
 ```
@@ -320,7 +320,7 @@ git commit -m "Adding git and nexus config"
 git push -u origin --all
 ```
 
-### Part 5 - MongoDB for CI tests
+### 第 5 部分 - 用于 CI 测试的 MongoDB
 > _In order to run our API tests in CI in later labs; we need there to be a MongoDB available for executing our tests. As this is part of our CI/CD Lifecycle; we will add it now._
 
 1. Open `enablement-ci-cd` in your favourite editor. Edit the `inventory/host_vars/ci-cd-tooling.yml` to include a new object for our mongodb as shown below. This item can be added below Nexus in the `ci-cd-tooling` section.
