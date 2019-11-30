@@ -300,7 +300,7 @@ ansible-playbook apply.yml -e target=tools \
 
 ### 第 4 部分 - 提交 CI/CD
 
-1. 打开 GitLab 登录页面。你可以在 LDAP 标签使用集群的用户名和密码登录。
+1. 打开 GitLab 登录页面。你可以在 LDAP 标签使用集群的登录凭据（用户名和密码）进行登录。
 ![gitlab-ui](../images/exercise1/gitlab-ui.png)
 
 2. 登录完成后，创建一个名为 `enablement-ci-cd` 的新项目，并将其可见级别设置为 `Internal`。创建完成后，在下一页将其 `git url` 复制出来备用。
@@ -426,7 +426,7 @@ greenballs:1.15
 
 为什么 Jenkins 使用蓝色表示构建成功？可以在 [on reddit](https://www.reddit.com/r/programming/comments/4lu6q8/why_does_jenkins_have_blue_balls/) 或者 [Jenkins 博客](https://jenkins.io/blog/2012/03/13/why-does-jenkins-have-blue-balls/) 上阅读更多详情。
 
-1. 在构建、部署 Jenkins s2i 之前，要为把你的 Git 用户名密码告诉它，因为Jenkins 访问存储有我们应用的 Git 仓库时需要用到。由于我们希望能从 Jenkins 向Git 仓库推送 Git 标签，所以需要写入权限。请创建 `params/jenkins-s2i-secret` 文件，并向其中添加下列内容，请对应地替换其中各个变量的值。我们需要修改用于绑定在 Jenkins 中绑定凭据的 secret。
+1. 在构建、部署 Jenkins s2i 之前，要为把你的 Git 登录凭据告诉它，因为Jenkins 访问存储有我们应用的 Git 仓库时需要用到。由于我们希望能从 Jenkins 向Git 仓库推送 Git 标签，所以需要写入权限。请创建 `params/jenkins-s2i-secret` 文件，并向其中添加下列内容，请对应地替换其中各个变量的值。我们需要修改用于值入 Jenkins 中的登录凭据的 secret。
 
 <kbd>📝 *enablement-ci-cd/params/jenkins-s2i-secret*</kbd>
 ```
@@ -436,7 +436,7 @@ PASSWORD=<YOUR_LDAP_PASSWORD>
 ```
 其中
 * `<YOUR_LDAP_USERNAME>` 是构建 Slave 将用于登录并克隆项目时使用的用户名
-* `<YOUR_LDAP_PASSWORD>` 是构建 Slave 将用于认证并克隆项目时使用的用户名
+* `<YOUR_LDAP_PASSWORD>` 是构建 Slave 将用于认证并克隆项目时使用的密码
 
 
 6. 创建文件 `params/jenkins-s2i`，并添加如下内容，请对应地替换其中各个变量的值。
@@ -501,25 +501,30 @@ ansible-playbook apply.yml -e target=tools \
 11.  这会触发一次 s2i 构建，完成之后，就会在项目里创建新的 ImageStream `<YOUR_NAME>-ci-cd/jenkins:latest`。一旦镜像产生，部署就会自动开始。打开 OpenShift 控制台中的项目，即可查看 s2i 构建的详细情况：
 ![jenkins-s2i-log](../images/exercise1/jenkins-s2i-log.png)
 
-1.  Jenkins 部署完成后，即可登录（使用 OpenShift 身份登录，并接受角色权限），你应该能看到一个几乎空的 Jenkins 环境，其中只包含示例任务。
+12. 部署完成后，Jenkins 即可登录（使用 OpenShift 身份登录，并接受角色权限），你应该能看到一个几乎空的 Jenkins 环境，其中只包含示例任务。
 
 ### 第 7 部分 - Jenkins Hello World
-> _To test things are working end-to-end; create a hello world job that doesn't do much but proves we can pull code from git and that our builds are green._
+> _为了确保各项设施都工作正常，我们来创建一个 hello world 任务，它做的事不多，却可以验证能够正确 git 拉取代码，并且构建成功后展示为绿色。_
 
-1. Log in to Jenkins and hit `New Item`<br>![new-item](../images/exercise1/new-item.png).
+1. 登录 Jenkins，点击 `新任务`
+![new-item](../images/exercise1/new-item.png).
 
-2. Create an item called `hello-world` with type `Freestyle project` ![jenkins-new-hello-world](../images/exercise1/jenkins-new-hello-world.png).
+1. 创建名为 `hello-world` 的任务，并设置类型为 `自由风格的任务`
+![jenkins-new-hello-world](../images/exercise1/jenkins-new-hello-world.png).
 
-3. On the Source Code Management tab, add your `enablement-ci-cd` git repo and hit the dropdown to add your credentials we baked into the s2i on previous steps ![jenkins-scm-git](../images/exercise1/jenkins-scm-git.png)
+3. 在“源代码管理”标签，添加你的 `enablement-ci-cd` 项目仓库的地址，在下列列表中选择你的 Git 登录凭据，它是我们在之前的步骤中植入的。
+![jenkins-scm-git](../images/exercise1/jenkins-scm-git.png)
 
-4. On the build tab add an Execute Shell step and fill it with `echo "Hello World"` ![jenkins-hello-world](../images/exercise1/jenkins-hello-world.png).
+4. 在构建标签，添加构建“执行 Shell”，并向其中填入 `echo "Hello World"`
+![jenkins-hello-world](../images/exercise1/jenkins-hello-world.png).
 
-5. Run the build and we should see it pass successfully and with a Green ball! ![jenkins-green-balls](../images/exercise1/jenkins-green-balls.png)
+5. 运行构建，我们应该能看到它成功地通过，并展示出绿色的小球。
+![jenkins-green-balls](../images/exercise1/jenkins-green-balls.png)
 
-### Part 8 - Live, Die, Repeat
-> _In this section you will prove the infra as code is working by deleting your Cluster Content and recreating it all_
+### 第 8 部分 - 线上？下线！从头再来
+> _在这一部分，你将通过删除集群上的资源并完全重新创建的操作来验证“基础设施即代码”是有效的。_
 
-1. Commit your code to the new repo in GitLab
+1. 向新的代码仓库中提交你的代码。
 ```bash
 git add .
 ```
@@ -530,17 +535,17 @@ git commit -m "ADD - all ci/cd contents"
 git push
 ```
 
-2. Burn your OpenShift project resources to the ground
+2. 完全销毁 OpenShift 项目中的资源
 ```bash
 oc delete project <YOUR_NAME>-ci-cd <YOUR_NAME>-dev <YOUR_NAME>-test
 ```
 
-3. Check to see the projects that were marked for deletion are removed.
+3. 检查各个项目，以确保我们要删除的项目确实已经消失。
 ```bash
 oc get projects | egrep '<YOUR_NAME>-ci-cd|<YOUR_NAME>-dev|<YOUR_NAME>-test'
 ```
 
-4. Re-apply the inventory to re-create it all!
+4. 重放主机清单，并再次创建所有资源！
 ```bash
 oc login <CLUSTER_URL>
 ```
@@ -553,12 +558,12 @@ ansible-playbook apply.yml -i inventory/ -e target=tools
 
 _____
 
-## Extension Tasks
-> _Ideas for go-getters. Advanced topic for doers to get on with if they finish early. These will usually not have a solution and are provided for additional scope._
+## 扩展任务
+> _这部分是为早期完成的参与者的扩展话题。通常我们并不为这些步骤提供操作步骤，以作为超纲内容提供。_
 
- - Add more secure access for Nexus (ie not admin / admin123) using the automation to drive secret creation
- - Add a SonarQube persistent deployment to the `ci-cd-deployments` section.
- - Add `jenkins.plugins.slack.SlackNotifier.xml` to `jenkins-s2i/configuration` to include URL of Slack for team build notifications and rebuild Jenkins S2I
+ - 以自动化的方式，基于 secret 为 Nexus 植入更安全的访问方式（比如，不使用 admin / admin123）
+ - 为 `ci-cd-deployments` 添加具有持久化存储的 SonarQube 部署
+ - 向 `jenkins-s2i/configuration` 添加 `jenkins.plugins.slack.SlackNotifier.xml` 将团队的 Slack 聊天室 URL作为团队的构建通知，并重新构建 Jenkins S2I 过程。
 
 _____
 
