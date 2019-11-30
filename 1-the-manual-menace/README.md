@@ -64,7 +64,7 @@ If you're feeling confident and don't want to follow the step-by-step guide thes
 ### 第 1 部分 - 创建云端工作空间
 > _使用 Che 创建云端 IDE 环境_
 
-1. 要创建云端 IDE 环境，请打开一个浏览器，并访问以下 URL（“神奇链接”）：
+1. 要创建云端 IDE 环境，请打开一个浏览器，并访问以下 URL（“魔法链接”）：
 
 ```
 https://codeready-workspaces.apps.<DOMAIN_FOR_YOUR_CLASS>/dashboard/#/load-factory?name=DO500%20Template&user=admin
@@ -242,20 +242,20 @@ oc projects
 ![project-success](../images/exercise1/project-success.png)
 
 ### 第 3 部分 - Nexus
-> _Now that we have our Projects setup; we can start to populate them with Apps to be used in our dev lifecycle_
+> _现在，项目已经准备好了，我们可以开始向其中添加我们在开发过程中需要用到的应用了。_
 
-For this part, we will use an OpenShift Container Platform **template** to install and configure Nexus. This template contains all the things needed to set up a persistent Nexus server, exposing a service and route while also creating the persistent volume needed. Have a read through the template; at the bottom you'll see a collection of parameters we will pass to the template.
+在这一部分，我们将使用 OpenShift 容器平台的**模板**来安装并配置 Nexus。模板中包含了用于配置一个持久化的 Nexus 服务器的所有内容：暴露服务与路由，并同时创建所需的持久化存储卷。请阅读模板，在底部你能看到一系列将要传入的参数。
 
 <p class="tip">
-<b>NOTE</b> - Below how we are utilizing an OpenShift Container Platform template from a different repository by accessing it by its RAW GitHub URL (from the redhat-cop repo in this case)
+<b>提示</b> - 下面，我们使用的是从另一个代码仓库（这里使用的是 redhat-cop）的 GitHub 原始 URL 下载的 OpenShift 容器平台模板。
 </p>
 
-1. In your cloud ide terminal add some parameters for running the template by creating a new file in the `params` directory.
+1. 在你的云端 IDE 中，在 `params` 目录中创建一个新文件来添加用于运行模板的参数。
 ```bash
 touch params/nexus
 ```
 
-2. The essential params to include in this file are:
+2. 文件里需要包含的参数有:
 
 <kbd>📝 *enablement-ci-cd/params/nexus*</kbd>
 ```
@@ -263,10 +263,9 @@ VOLUME_CAPACITY=5Gi
 MEMORY_LIMIT=1Gi
 ```
 
-* You'll notice that this is different from how we defined our params for our projects. This is because there are multiple ways to do this. In cases like this, there may be a need to change some of these variables more frequently than others (i.e. giving the app more memory,etc.). In this case, it's easier to maintain them within their own separate params files.
+* 你可能注意到了，这与项目参数的定义方式有所不同。这是因为，定义参数的方式可以有很多。在这个例子里，某些变量的的变化可能比其他变量更频繁（比如，给应用分配更多内存等等）。这种情况下，把它们放在专用的的参数文件会更好。
 
-
-3. Create a new object in the inventory variables `inventory/host_vars/ci-cd-tooling.yml` called `ci-cd-tooling` and populate its `content` as follows
+3. 在主机清单变量文件 `inventory/host_vars/ci-cd-tooling.yml` 里创建一个名为 `ci-cd-tooling` 新的对象，并按照以下方式设置其 `content` 值：
 
 <kbd>📝 *enablement-ci-cd/inventory/host_vars/ci-cd-tooling.yml*</kbd>
 ```yaml
@@ -286,19 +285,20 @@ openshift_cluster_content:
 ![ci-cd-deployments-yml](../images/exercise1/ci-cd-deployments-yml.png)
 
 <p class="tip">
-<b>NOTE</b> The <i>galaxy_requirements</i> above is necessary to pull in the pre/post steps dependencies as explained under the Jenkins section below.
+<b>提示</b> 后面会提到，上面内容中的 <i>galaxy_requirements</i> 是在拉取提前和后置步骤的依赖时需要用到的必须配置。
 </p>
 
-4. Run the OpenShift applier, specifying the tag `nexus` to speed up its execution (`-e target=tools` is to run the other inventory).
+4. 运行 OpenShift applier，指定标签 `nexus` 来提高执行速度（`-e target=tools` 是用于运行另一个主机清单）。
 ```bash
 ansible-playbook apply.yml -e target=tools \
      -i inventory/ \
      -e "filter_tags=nexus"
 ```
 
-5. Once successful, login to the cluster through the browser (using cluster URL) and navigate to the `<YOUR_NAME>-ci-cd`. You should see Nexus up and running. You can login with default credentials (admin / admin123) ![nexus-up-and-running](../images/exercise1/nexus-up-and-running.png)
+5. 成功之后，从浏览器登录集群（使用集群 URL），并切换到 `<YOUR_NAME>-ci-cd` 项目。你应该能看到 Nexus 已经成功启动。你可以使用默认的身份信息进行登录（admin / admin123）
+![nexus-up-and-running](../images/exercise1/nexus-up-and-running.png)
 
-### Part 4 - Commit CI/CD
+### 第 4 部分 - 提交 CI/CD
 
 1. Navigate to GitLab login page. You can login using your cluster credentials using the LDAP tab
 ![gitlab-ui](../images/exercise1/gitlab-ui.png)
