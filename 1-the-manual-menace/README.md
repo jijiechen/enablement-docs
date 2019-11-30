@@ -347,7 +347,7 @@ git commit -m "ADD - mongodb for use in the pipeline"
 git push
 ```
 
-1. 按照上面一样的方式，执行 Ansible 以令这些变更生效。在 OpenShift 上，转到 `<YOUR_NAME>-ci-cd` 命名空间就可以验证部署的 MongoDB 服务是否已经出现。
+3. 按照上面一样的方式，执行 Ansible 以令这些变更生效。在 OpenShift 上，转到 `<YOUR_NAME>-ci-cd` 命名空间就可以验证部署的 MongoDB 服务是否已经出现。
 ```bash
 ansible-playbook apply.yml -e target=tools \
   -i inventory/ \
@@ -360,9 +360,9 @@ ansible-playbook apply.yml -e target=tools \
 </p>
 
 ### 第 6 部分 - Jenkins 和 S2I
-> _Create a build and deployment config for Jenkins. Add new configuration and plugins to the OpenShift default Jenkins image using s2i_
+> _创建 Jenkins 的 Build Config 和 Deployment Config。使用 s2i 机制向 OpenShift 上的默认 Jenkins 镜像添加新的配置和插件_
 
-1. As before; create a new set of params by creating a `params/jenkins` file and adding some overrides to the template and updating the `<YOUR_NAME>` value accordingly.
+1. 按照之前一样的方式，通过新建一个 `params/jenkins` 文件来创建一组参数，在模板中添加变量，然后完成 `<YOUR_NAME>` 的替换。
 
 <kbd>📝 *enablement-ci-cd/params/jenkins*</kbd>
 ```
@@ -372,13 +372,12 @@ JVM_ARCH=x86_64
 NAMESPACE=<YOUR_NAME>-ci-cd
 JENKINS_OPTS=--sessionTimeout=720
 ```
-  * You might be wondering why we have to replace <YOUR_NAME> here and can't just rely on the `namespace_prefix` variable that we've been using previously. This is because the replacement is handled by two different engines (one being ansible -- which knows about `namespace_prefix` and the other being the oc client, which does not). Because the params files are processed by the oc client, we need to update this here.
+  * 你可能会好奇为什么在这里一定要替换 `<YOUR_NAME>`，而不能直接使用之前用过的 `namespace_prefix` 变量。这是由于这里的变量替换过程是由另一个模板引擎完成的（一个是 Ansible，它可以处理 `namespace_prefix`；而另一个是 oc 客户端工具，它不能处理 `namespace_prefix`）。这里参数文件是用 oc 客户端工具处理的，所以在这里需要完成替换。
 
-2. Add a `jenkins` variable to the Ansible inventory underneath the jenkins-mongo in  `inventory/host_vars/ci-cd-tooling.yml` as shown below to create a DeploymentConfig for Jenkins. In order for Jenkins to be able to run `npm` commands we must configure a jenkins build slave for it to use. This slave will be dynamically provisioned when we run a build. It needs to have Node.js and npm and a C compiler installed in it. 
+2. 在 Ansible 的主机清单文件 `inventory/host_vars/ci-cd-tooling.yml` 的 jenkins-mongo 的下方，按照下面的方式添加 `jenkins` 变量，以创建 Jenkins 的 DeploymentConfig。为了让 Jenkins 能够运行一系列的 `npm` 命令，我们需要为 Jenkins 配置一个 Build Slave，它需要安装有 Node.js、npm 和 C 编译器。这个 Slave 会在构建运行期间动态地生成。
 
 <p class="tip">
-<b>NOTE</b> These slaves can take a time to build themselves so to speed up we have placed the slave with a corresponding ImageStream within OpenShift. To leverage this existing slave image, we are using a feature of the openshift-applier to process a couple of post-steps part of the inventory. These steps are utilized to perform pre and post tasks necessary to make our inventory work correctly. In this case, we use the post steps to tag and label the jenkins-slave-npm ImageStream within our CI/CD project so Jenkins knows how to find and use it.
-</p>
+<b>提示</b> 这些 Slave 本身的构建过程可能需要花一些时间，所以为了提高效率，我们在 OpenShift 上给 Slave 配置了对应的 ImageStream。为了利用这个预置的镜像，我们使用了 openshift-applier 中的一个功能来处理主机清单的一系列后置步骤。为了让主机清单正确工作，有一些必要的前置和后置任务。这些步骤就是用来处理这些任务。在这里，我们使用了后置步骤来标记我们的 CI/CD 项目中的 jenkins-slave-npm 这个 ImageStream，从而让 Jenkins 能够找到并使用。</p>
 
 <kbd>📝 *enablement-ci-cd/inventory/host_vars/ci-cd-tooling.yml*</kbd>
 ```yaml
@@ -399,11 +398,11 @@ JENKINS_OPTS=--sessionTimeout=720
     tags:
     - jenkins
 ```
-This configuration, if applied now, will create the deployment configuration needed for Jenkins but the `${NAMESPACE}:${JENKINS_IMAGE_STREAM_TAG}` in the template won't exist yet.
+如果现在应用这个配置，它就会创建 Jenkins 所需的 DeploymentConfig，但目前 `${NAMESPACE}:${JENKINS_IMAGE_STREAM_TAG}` 还不存在。
 
-3. To create this image we will take the supported OpenShift Container Platform Jenkins Image and bake in some extra configuration using an [s2i](https://github.com/openshift/source-to-image) builder image. More information on Jenkins s2i is found on the [openshift/jenkins](https://github.com/openshift/jenkins#installing-using-s2i-build) GitHub page. To create an s2i configuration for Jenkins, start with the pre-canned configuration source in the `enablement-ci-cd` repo (in the jenkins-s2i directory).
+3. 接下来创建这个镜像。我们基于 OpenShift 容器平台支持的 Jenkins 镜像，并使用 [s2i](https://github.com/openshift/source-to-image) 构建器镜像向其中植入一些额外的配置。关于 Jenkins s2i 的更多信息，请参考 [openshift/jenkins](https://github.com/openshift/jenkins#installing-using-s2i-build) GitHub 页面。为了创建给 Jenkins 用的 s2i 配置，我们从 `enablement-ci-cd` 已经准备好的原有配置开始（在 `jenkins-s2i` 目录）。
 
-The structure of the Jenkins s2i config is
+Jenkins s2i 配置的结构为：
 ```
 jenkins-s2i
 ├── README.md
@@ -414,20 +413,20 @@ jenkins-s2i
 │   ├── scriptApproval.xml
 └── plugins.txt
 ```
- * `plugins.txt` is a list of `pluginId:version` for Jenkins to pre-install when starting
- * `./configuration` contains content that is placed in `${JENKINS_HOME}`. A `config.xml` could be placed in here to control the bulk of Jenkins configuration.
- * `build-failure-analyzer.xml` is config for the plugin to read the logs and look for key items based on a Regex. More on this in later lessons.
- * `init.groovy` contains a collection of settings jenkins configures itself with when launching
+ * `plugins.txt` 是由一系列 `pluginId:version` 构成的列表，可用于 Jenkins 启动时自动安装这些插件
+ * `./configuration` 包含会置于 `${JENKINS_HOME}` 的内容。这里的`config.xml` 文件可用于批量控制 Jenkins 设置
+ * `build-failure-analyzer.xml` 是用于插件读取并按正则表达式定位日志的配置，课程后面会涉及到更多这方面的内容
+ * `init.groovy` 包含一系列 Jenkins 在启动时对其自身进行设置的脚本
 
-4. Let's add a plugin for Jenkins to be started with, [green-balls](https://plugins.jenkins.io/greenballs). This simply changes the default `SUCCESS` status of Jenkins from Blue to Green. Append the `jenkins-s2i/plugins.txt` file with
+4. 作为开始，我们来给 Jenkins 添加插件 [green-balls](https://plugins.jenkins.io/greenballs)。它的功能只是将 Jenkins 默认的 `SUCCESS` 状态从蓝色改为绿色。在文件 `jenkins-s2i/plugins.txt` 末尾添加下面的内容：
 ```txt
 greenballs:1.15
 ```
 ![green-balls.png](../images/exercise1/green-balls.png)
 
-Why does Jenkins use blue to represent success? More can be found [on reddit](https://www.reddit.com/r/programming/comments/4lu6q8/why_does_jenkins_have_blue_balls/) or the [Jenkins blog](https://jenkins.io/blog/2012/03/13/why-does-jenkins-have-blue-balls/).
+为什么 Jenkins 使用蓝色表示构建成功？可以在 [on reddit](https://www.reddit.com/r/programming/comments/4lu6q8/why_does_jenkins_have_blue_balls/) 或者 [Jenkins 博客](https://jenkins.io/blog/2012/03/13/why-does-jenkins-have-blue-balls/) 上阅读更多详情。
 
-5. Before building and deploying the Jenkins s2i; add your git credentials to it. These will be used by Jenkins to access the Git Repositories where our apps will be stored. We want Jenkins to be able to push tags to it, so write access is required. Create `params/jenkins-s2i-secret` and add the following content; replacing variables as appropriate. There is an annotation on the secret which binds the credential in Jenkins
+1. 在构建、部署 Jenkins s2i 之前，要为把你的 Git 用户名密码告诉它，因为Jenkins 访问存储有我们应用的 Git 仓库时需要用到。由于我们希望能从 Jenkins 向Git 仓库推送 Git 标签，所以需要写入权限。请创建 `params/jenkins-s2i-secret` 文件，并向其中添加下列内容，请对应地替换其中各个变量的值。我们需要修改用于绑定在 Jenkins 中绑定凭据的 secret。
 
 <kbd>📝 *enablement-ci-cd/params/jenkins-s2i-secret*</kbd>
 ```
@@ -435,12 +434,12 @@ SECRET_NAME=gitlab-auth
 USERNAME=<YOUR_LDAP_USERNAME>
 PASSWORD=<YOUR_LDAP_PASSWORD>
 ```
-where
-    * `<YOUR_LDAP_USERNAME>` is the username builder pod will use to login and clone the repo with
-    * `<YOUR_LDAP_PASSWORD>` is the password the builder pod will use to authenticate and clone the repo using
+其中
+* `<YOUR_LDAP_USERNAME>` 是构建 Slave 将用于登录并克隆项目时使用的用户名
+* `<YOUR_LDAP_PASSWORD>` 是构建 Slave 将用于认证并克隆项目时使用的用户名
 
 
-6. Create `params/jenkins-s2i` and add the following content; replacing variables as appropriate.
+6. 创建文件 `params/jenkins-s2i`，并添加如下内容，请对应地替换其中各个变量的值。
 
 <kbd>📝 *enablement-ci-cd/params/jenkins-s2i*</kbd>
 ```
@@ -449,11 +448,10 @@ NAME=jenkins
 SOURCE_REPOSITORY_CONTEXT_DIR=jenkins-s2i
 SOURCE_REPOSITORY_SECRET=gitlab-auth
 ```
-where
-    * `<GIT_URL>` is the full clone path of the repo where this project is stored (including the https && .git)
+其中
+* `<GIT_URL>` 是存储项目所在仓库的完整路径（包括 https 和 .git）
 
-
-7. At the top of `inventory/host_vars/ci-cd-tooling.yml` file underneath the `---`, add the following:
+7. 在文件 `inventory/host_vars/ci-cd-tooling.yml` 的顶部，`---` 的下方，添加如下内容：
 
 <kbd>📝 *enablement-ci-cd/inventory/host_vars/ci-cd-tooling.yml*</kbd>
 ```yaml
@@ -461,7 +459,7 @@ ci_cd:
   IMAGE_STREAM_NAMESPACE: "{{ ci_cd_namespace }}"
 ```
 
-8. Create a new object `ci-cd-builds` in the Ansible `inventory/host_vars/ci-cd-tooling.yml` to drive the s2i build configuration.
+8. 在 Ansible 清单文件 `inventory/host_vars/ci-cd-tooling.yml` 中创建新的对象 `ci-cd-builds`，用于配置 s2i build：
 
 <kbd>📝 *enablement-ci-cd/inventory/host_vars/ci-cd-tooling.yml*</kbd>
 ```yaml
@@ -482,7 +480,7 @@ ci_cd:
     - jenkins
 ```
 
-9. Commit your code to your GitLab instance
+9. 把代码提交到 GitLab
 ```bash
 git add .
 ```
@@ -493,19 +491,19 @@ git commit -m "Adding Jenkins and Jenkins s2i"
 git push
 ```
 
-10. Now your code is commited; run the OpenShift Applier to add the config to the cluster
+10. 代码提交完成之后，运行 OpenShift Applier，将这些配置添加到集群上
 ```bash
 ansible-playbook apply.yml -e target=tools \
      -i inventory/ \
      -e "filter_tags=jenkins"
 ```
 
-11. This will trigger a build of the s2i and when it's complete it will add an imagestream of `<YOUR_NAME>-ci-cd/jenkins:latest` to the project. The Deployment config should kick in and deploy the image once it arrives. You can follow the build of the s2i by going to the OpenShift console's project
+11.  这会触发一次 s2i 构建，完成之后，就会在项目里创建新的 ImageStream `<YOUR_NAME>-ci-cd/jenkins:latest`。一旦镜像产生，部署就会自动开始。打开 OpenShift 控制台中的项目，即可查看 s2i 构建的详细情况：
 ![jenkins-s2i-log](../images/exercise1/jenkins-s2i-log.png)
 
-12. When the Jenkins deployment has completed; login (using your OpenShift credentials) and accept the role permissions. You should now see a fairly empty Jenkins with just the seed job
+1.  Jenkins 部署完成后，即可登录（使用 OpenShift 身份登录，并接受角色权限），你应该能看到一个几乎空的 Jenkins 环境，其中只包含示例任务。
 
-### Part 7 - Jenkins Hello World
+### 第 7 部分 - Jenkins Hello World
 > _To test things are working end-to-end; create a hello world job that doesn't do much but proves we can pull code from git and that our builds are green._
 
 1. Log in to Jenkins and hit `New Item`<br>![new-item](../images/exercise1/new-item.png).
