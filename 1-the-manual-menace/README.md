@@ -306,7 +306,7 @@ ansible-playbook apply.yml -e target=tools \
 2. 登录完成后，创建一个名为 `enablement-ci-cd` 的新项目，并将其可见级别设置为 `Internal`。创建完成后，在下一页将其 `git url` 复制出来备用。
 ![gitlab-new-project](../images/exercise1/gitlab-new-project.png)
 
-1. 把本地项目，通过先移除在第一步中克隆 Ansible 项目时所使用的 GitHub 远端，即可提交到这个新的 Git 服务器。在下面的命令中，不要忘记将 `<GIT_URL>` 替换为你刚才创建的 `enablement-ci-cd` 仓库的 `git url`。
+3. 把本地项目，通过先移除在第一步中克隆 Ansible 项目时所使用的 GitHub 远端，即可提交到这个新的 Git 服务器。在下面的命令中，不要忘记将 `<GIT_URL>` 替换为你刚才创建的 `enablement-ci-cd` 仓库的 `git url`。
 ```bash
 git remote set-url origin <GIT_URL>
 ```
@@ -321,9 +321,9 @@ git push -u origin --all
 ```
 
 ### 第 5 部分 - 用于 CI 测试的 MongoDB
-> _In order to run our API tests in CI in later labs; we need there to be a MongoDB available for executing our tests. As this is part of our CI/CD Lifecycle; we will add it now._
+> _为了支持后续的操作中的 API 测试，我们需要一个供测试执行期间用的 MongoDB。它会成为我们 CI/CD 流程中的一部分，我们现在就来创建它。_
 
-1. Open `enablement-ci-cd` in your favourite editor. Edit the `inventory/host_vars/ci-cd-tooling.yml` to include a new object for our mongodb as shown below. This item can be added below Nexus in the `ci-cd-tooling` section.
+1. 在你的编辑器中打开 `enablement-ci-cd` 项目。编辑文件 `inventory/host_vars/ci-cd-tooling.yml`，按照下面的方式为 MongoDB 添加一个新的对象。可以把它放在 `ci-cd-tooling` 中 Nexus 的下方。
 
 <kbd>📝 *enablement-ci-cd/inventory/host_vars/ci-cd-tooling.yml*</kbd>
 ```yaml
@@ -336,7 +336,7 @@ git push -u origin --all
 ```
 ![jenkins-mongo](../images/exercise1/jenkins-mongo.png)
 
-2. Git commit your updates to the inventory to git for traceability.
+2. 使用 Git 提交这些更改以保留记录。
 ```bash
 git add .
 ```
@@ -347,7 +347,7 @@ git commit -m "ADD - mongodb for use in the pipeline"
 git push
 ```
 
-3. Apply this change as done previously using Ansible. The deployment can be validated by going to your `<YOUR_NAME>-ci-cd` namespace and checking if it is there!
+1. 按照上面一样的方式，执行 Ansible 以令这些变更生效。在 OpenShift 上，转到 `<YOUR_NAME>-ci-cd` 命名空间就可以验证部署的 MongoDB 服务是否已经出现。
 ```bash
 ansible-playbook apply.yml -e target=tools \
   -i inventory/ \
@@ -356,10 +356,10 @@ ansible-playbook apply.yml -e target=tools \
 ![ocp-mongo](../images/exercise3/ocp-mongo.png)
 
 <p class="tip">
-<b>NOTE</b> - When making changes to the "enablement-ci-cd" repo, you should frequently commit and push the changes to git.
+<b>提示</b> - 当修改 "enablement-ci-cd" 项目时，请尽量频繁地提交并推送到 Git 服务器。
 </p>
 
-### Part 6 - Jenkins & S2I
+### 第 6 部分 - Jenkins 和 S2I
 > _Create a build and deployment config for Jenkins. Add new configuration and plugins to the OpenShift default Jenkins image using s2i_
 
 1. As before; create a new set of params by creating a `params/jenkins` file and adding some overrides to the template and updating the `<YOUR_NAME>` value accordingly.
