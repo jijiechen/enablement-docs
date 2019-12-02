@@ -61,7 +61,7 @@ If you're feeling confident and don't want to follow the step-by-step guide thes
 ## 操作步骤
 <!-- > This is a structured guide with references to exact filenames and explanations.  -->
 
-### 一 - 创建云端工作空间
+### 一、创建云端工作空间
 > _使用 Che 创建云端 IDE 环境_
 
 1. 要创建云端 IDE 环境，请打开一个浏览器，并访问以下 URL（“魔法链接”）：
@@ -86,7 +86,7 @@ https://codeready-workspaces.apps.<DOMAIN_FOR_YOUR_CLASS>/dashboard/#/load-facto
 
 ![che-workspace-done](../images/exercise1/che-workspace-done.png)
 
-### 二 - 创建 OpenShift 项目
+### 二、创建 OpenShift 项目
 > _使用 OpenShift Applier, 我们将会在集群中创建新的命名空间（项目），在后面的练习中会持续用到这些命名空间。_
 
 1. 在这个课程的过程中，我们会创建两个不同的 Git 项目。请在云端环境中选择 `Terminal > Run Task` 菜单。
@@ -241,7 +241,7 @@ oc projects
 
 ![project-success](../images/exercise1/project-success.png)
 
-### 三 - Nexus
+### 三、Nexus
 > _现在，项目已经准备好了，我们可以开始向其中添加我们在开发过程中需要用到的应用了。_
 
 在这一部分，我们将使用 OpenShift 容器平台的**模板**来安装并配置 Nexus。模板中包含了用于配置一个持久化的 Nexus 服务器的所有内容：暴露服务与路由，并同时创建所需的持久化存储卷。请阅读模板，在底部你能看到一系列将要传入的参数。
@@ -298,7 +298,7 @@ ansible-playbook apply.yml -e target=tools \
 5. 成功之后，从浏览器登录集群（使用集群 URL），并切换到 `<YOUR_NAME>-ci-cd` 项目。你应该能看到 Nexus 已经成功启动。你可以使用默认的用户名和密码进行登录（admin / admin123）
 ![nexus-up-and-running](../images/exercise1/nexus-up-and-running.png)
 
-### 四 - 提交 CI/CD
+### 四、提交 CI/CD
 
 1. 打开 GitLab 登录页面。你可以在 LDAP 标签使用集群的登录凭据（用户名和密码）进行登录。
 ![gitlab-ui](../images/exercise1/gitlab-ui.png)
@@ -320,7 +320,7 @@ git commit -m "Adding git and nexus config"
 git push -u origin --all
 ```
 
-### 五 - 用于 CI 测试的 MongoDB
+### 五、用于 CI 测试的 MongoDB
 > _为了支持后续的操作中的 API 测试，我们需要一个供测试执行期间用的 MongoDB。它会成为我们 CI/CD 流程中的一部分，我们现在就来创建它。_
 
 1. 在你的编辑器中打开 `enablement-ci-cd` 项目。编辑文件 `inventory/host_vars/ci-cd-tooling.yml`，按照下面的方式为 MongoDB 添加一个新的对象。可以把它放在 `ci-cd-tooling` 中 Nexus 的下方。
@@ -359,7 +359,7 @@ ansible-playbook apply.yml -e target=tools \
 <b>提示</b> - 当修改 "enablement-ci-cd" 项目时，请尽量频繁地提交并推送到 Git 服务器。
 </p>
 
-### 六 - Jenkins 和 S2I
+### 六、Jenkins 和 S2I
 > _创建 Jenkins 的 Build Config 和 Deployment Config。使用 s2i 机制向 OpenShift 上的默认 Jenkins 镜像添加新的配置和插件_
 
 1. 按照之前一样的方式，通过新建一个 `params/jenkins` 文件来创建一组参数，在模板中添加变量，然后完成 `<YOUR_NAME>` 的替换。
@@ -503,7 +503,7 @@ ansible-playbook apply.yml -e target=tools \
 
 12. 部署完成后，Jenkins 即可登录（使用 OpenShift 身份登录，并接受角色权限），你应该能看到一个几乎空的 Jenkins 环境，其中只包含示例任务。
 
-### 七 - Jenkins Hello World
+### 七、Jenkins Hello World
 > _为了确保各项设施都工作正常，我们来创建一个 hello world 任务，它做的事不多，却可以验证能够正确 git 拉取代码，并且构建成功后展示为绿色。_
 
 1. 登录 Jenkins，点击 `新任务`
@@ -521,7 +521,7 @@ ansible-playbook apply.yml -e target=tools \
 5. 运行构建，我们应该能看到它成功地通过，并展示出绿色的小球。
 ![jenkins-green-balls](../images/exercise1/jenkins-green-balls.png)
 
-### 八 - 线上？下线！从头再来
+### 八、线上？下线！从头再来
 > _在这一部分，你将通过删除集群上的资源并完全重新创建的操作来验证“基础设施即代码”是有效的。_
 
 1. 向新的代码仓库中提交你的代码。
