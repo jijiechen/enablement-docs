@@ -61,7 +61,7 @@ If you're feeling confident and don't want to follow the step-by-step guide thes
 ## 操作步骤
 <!-- > This is a structured guide with references to exact filenames and explanations.  -->
 
-### 第 1 部分 - 创建云端工作空间
+### 一 - 创建云端工作空间
 > _使用 Che 创建云端 IDE 环境_
 
 1. 要创建云端 IDE 环境，请打开一个浏览器，并访问以下 URL（“魔法链接”）：
@@ -86,7 +86,7 @@ https://codeready-workspaces.apps.<DOMAIN_FOR_YOUR_CLASS>/dashboard/#/load-facto
 
 ![che-workspace-done](../images/exercise1/che-workspace-done.png)
 
-### 第 2 部分 - 创建 OpenShift 项目
+### 二 - 创建 OpenShift 项目
 > _使用 OpenShift Applier, 我们将会在集群中创建新的命名空间（项目），在后面的练习中会持续用到这些命名空间。_
 
 1. 在这个课程的过程中，我们会创建两个不同的 Git 项目。请在云端环境中选择 `Terminal > Run Task` 菜单。
@@ -233,7 +233,7 @@ ansible-playbook apply.yml -i inventory/ -e target=bootstrap
 
 ![playbook-success](../images/exercise1/play-book-success.png)
 
-13. 可以通过运行下面的命令来查看成功创建的项目
+14. 可以通过运行下面的命令来查看成功创建的项目
 
 ```bash
 oc projects
@@ -241,7 +241,7 @@ oc projects
 
 ![project-success](../images/exercise1/project-success.png)
 
-### 第 3 部分 - Nexus
+### 三 - Nexus
 > _现在，项目已经准备好了，我们可以开始向其中添加我们在开发过程中需要用到的应用了。_
 
 在这一部分，我们将使用 OpenShift 容器平台的**模板**来安装并配置 Nexus。模板中包含了用于配置一个持久化的 Nexus 服务器的所有内容：暴露服务与路由，并同时创建所需的持久化存储卷。请阅读模板，在底部你能看到一系列将要传入的参数。
@@ -298,7 +298,7 @@ ansible-playbook apply.yml -e target=tools \
 5. 成功之后，从浏览器登录集群（使用集群 URL），并切换到 `<YOUR_NAME>-ci-cd` 项目。你应该能看到 Nexus 已经成功启动。你可以使用默认的用户名和密码进行登录（admin / admin123）
 ![nexus-up-and-running](../images/exercise1/nexus-up-and-running.png)
 
-### 第 4 部分 - 提交 CI/CD
+### 四 - 提交 CI/CD
 
 1. 打开 GitLab 登录页面。你可以在 LDAP 标签使用集群的登录凭据（用户名和密码）进行登录。
 ![gitlab-ui](../images/exercise1/gitlab-ui.png)
@@ -320,7 +320,7 @@ git commit -m "Adding git and nexus config"
 git push -u origin --all
 ```
 
-### 第 5 部分 - 用于 CI 测试的 MongoDB
+### 五 - 用于 CI 测试的 MongoDB
 > _为了支持后续的操作中的 API 测试，我们需要一个供测试执行期间用的 MongoDB。它会成为我们 CI/CD 流程中的一部分，我们现在就来创建它。_
 
 1. 在你的编辑器中打开 `enablement-ci-cd` 项目。编辑文件 `inventory/host_vars/ci-cd-tooling.yml`，按照下面的方式为 MongoDB 添加一个新的对象。可以把它放在 `ci-cd-tooling` 中 Nexus 的下方。
@@ -359,7 +359,7 @@ ansible-playbook apply.yml -e target=tools \
 <b>提示</b> - 当修改 "enablement-ci-cd" 项目时，请尽量频繁地提交并推送到 Git 服务器。
 </p>
 
-### 第 6 部分 - Jenkins 和 S2I
+### 六 - Jenkins 和 S2I
 > _创建 Jenkins 的 Build Config 和 Deployment Config。使用 s2i 机制向 OpenShift 上的默认 Jenkins 镜像添加新的配置和插件_
 
 1. 按照之前一样的方式，通过新建一个 `params/jenkins` 文件来创建一组参数，在模板中添加变量，然后完成 `<YOUR_NAME>` 的替换。
@@ -426,7 +426,7 @@ greenballs:1.15
 
 为什么 Jenkins 使用蓝色表示构建成功？可以在 [on reddit](https://www.reddit.com/r/programming/comments/4lu6q8/why_does_jenkins_have_blue_balls/) 或者 [Jenkins 博客](https://jenkins.io/blog/2012/03/13/why-does-jenkins-have-blue-balls/) 上阅读更多详情。
 
-1. 在构建、部署 Jenkins s2i 之前，要为把你的 Git 登录凭据告诉它，因为Jenkins 访问存储有我们应用的 Git 仓库时需要用到。由于我们希望能从 Jenkins 向Git 仓库推送 Git 标签，所以需要写入权限。请创建 `params/jenkins-s2i-secret` 文件，并向其中添加下列内容，请对应地替换其中各个变量的值。我们需要修改用于值入 Jenkins 中的登录凭据的 secret。
+5. 在构建、部署 Jenkins s2i 之前，要为把你的 Git 登录凭据告诉它，因为Jenkins 访问存储有我们应用的 Git 仓库时需要用到。由于我们希望能从 Jenkins 向Git 仓库推送 Git 标签，所以需要写入权限。请创建 `params/jenkins-s2i-secret` 文件，并向其中添加下列内容，请对应地替换其中各个变量的值。我们需要修改用于值入 Jenkins 中的登录凭据的 secret。
 
 <kbd>📝 *enablement-ci-cd/params/jenkins-s2i-secret*</kbd>
 ```
@@ -503,13 +503,13 @@ ansible-playbook apply.yml -e target=tools \
 
 12. 部署完成后，Jenkins 即可登录（使用 OpenShift 身份登录，并接受角色权限），你应该能看到一个几乎空的 Jenkins 环境，其中只包含示例任务。
 
-### 第 7 部分 - Jenkins Hello World
+### 七 - Jenkins Hello World
 > _为了确保各项设施都工作正常，我们来创建一个 hello world 任务，它做的事不多，却可以验证能够正确 git 拉取代码，并且构建成功后展示为绿色。_
 
 1. 登录 Jenkins，点击 `新任务`
 ![new-item](../images/exercise1/new-item.png).
 
-1. 创建名为 `hello-world` 的任务，并设置类型为 `自由风格的任务`
+2. 创建名为 `hello-world` 的任务，并设置类型为 `自由风格的任务`
 ![jenkins-new-hello-world](../images/exercise1/jenkins-new-hello-world.png).
 
 3. 在“源代码管理”标签，添加你的 `enablement-ci-cd` 项目仓库的地址，在下列列表中选择你的 Git 登录凭据，它是我们在之前的步骤中植入的。
@@ -521,7 +521,7 @@ ansible-playbook apply.yml -e target=tools \
 5. 运行构建，我们应该能看到它成功地通过，并展示出绿色的小球。
 ![jenkins-green-balls](../images/exercise1/jenkins-green-balls.png)
 
-### 第 8 部分 - 线上？下线！从头再来
+### 八 - 线上？下线！从头再来
 > _在这一部分，你将通过删除集群上的资源并完全重新创建的操作来验证“基础设施即代码”是有效的。_
 
 1. 向新的代码仓库中提交你的代码。
@@ -559,11 +559,11 @@ ansible-playbook apply.yml -i inventory/ -e target=tools
 _____
 
 ## 扩展任务
-> _这部分是为早期完成的参与者的扩展话题。通常我们并不为这些步骤提供操作步骤，以作为超纲内容提供。_
+> _这部分是为提前完成的学员准备的扩展话题。通常我们并不为这些步骤提供操作细节，仅作为超纲内容提供。_
 
  - 以自动化的方式，基于 secret 为 Nexus 植入更安全的访问方式（比如，不使用 admin / admin123）
  - 为 `ci-cd-deployments` 添加具有持久化存储的 SonarQube 部署
- - 向 `jenkins-s2i/configuration` 添加 `jenkins.plugins.slack.SlackNotifier.xml` 将团队的 Slack 聊天室 URL作为团队的构建通知，并重新构建 Jenkins S2I 过程。
+ - 向 `jenkins-s2i/configuration` 添加 `jenkins.plugins.slack.SlackNotifier.xml` 将团队的 Slack 聊天室 URL 作为团队的构建通知，并重新构建 Jenkins S2I 过程。
 
 _____
 

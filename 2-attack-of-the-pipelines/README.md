@@ -1,4 +1,4 @@
-# Attack of the Pipelines
+# 攻克流水线
 
 > In this exercise we will explore the sample TODO List application and create a pipeline in Jenkins to build and deploy our code.
 
