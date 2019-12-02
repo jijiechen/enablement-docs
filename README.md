@@ -1,48 +1,46 @@
-# DevOps Culture & Practice
+# DevOps 文化和实践
 
 ![jenkins-crio-ocp-star-wars-kubes](./images/jenkins-crio-ocp-star-wars-kubes.png)
 [image-ref](https://www.cloudbees.com/blog/get-ripped-jenkins-docker-industrial-strength-continuous-delivery)
 
-## Learner Outcomes
-* Provide an immersive experience for students through practical application of DevOps culture using modern software development practices.
+## 学员收益
+* 在现代化软件开发实践中沉浸式体验 DevOps 文化的实战式运用
+* 让学员在 DevOps 之路的开端就感受到团队文化的变化
 
-* Allow students to experience the cultural shift they need to make in order to begin a successful DevOps journey.
+## 集群信息
 
-## Cluster Information
+完成动手练习过程需要一个 OpenShift 集群。讲师将通过电子邮件和现场讲解为学员提供以下关于 OpenShift 集群的信息：
+ - <**CLUSTER_URL**> -- OpenShift Web 控制台及 API 服务器的 URL
+ - <**APPS_URL**> -- 在集群上部署的应用使用的通用域名
 
-An OpenShift Cluster is required to complete the lab exercises. Students will receive by email (and by the instructors on site) the following information regarding the OpenShift cluster:
- - <**CLUSTER_URL**> -- OpenShift Webconsole/API Server URL
- - <**APPS_URL**> -- Wildcard subdomain for the exposed applications deployed in the Cluster
+## 学员准备
+下面列举了在课堂上执行练习所需要的最小硬件需求：
+* 64 位 Intel i5/i7 或同等性能 CPU，启用虚拟化扩展功能
+* 4GB 内存
+* 80GB 硬盘
 
-## Learner Pre-requisites
-The following are the minimal hardware requirements for running the lab exercises in this course
-* 64-bit Intel Core i5/i7 CPU or equivalent with virtualization extensions enabled
-* 4GB memory
-* 80GB hard disk
-
-The lab exercises have been tested on the following operating systems
+动手练习的过程通过过如下环境测试：
  * Fedora 29 or 30 64-bit x86_64
  * Microsoft Windows 10 Pro 64-bit
  * macOS 10.14 "Mojave"
 
-The following table lists the software requirements for running the lab exercises:
+下面的表格列举了运行动手练习环境所需要的软件需求：
 
- | Software | Version | Check |
+ | 软件 | 版本 | 检查方法 |
  | -------- | ------- | ----- |
- | OCP CLI | v3.11 | $ oc version &#124; grep -i --color oc |
+ | OCP 命令行客户端 | v3.11 | $ oc version &#124; grep -i --color oc |
  | Ansible | => v2.8 | $ ansible --version &#124; grep -i --color ansible |
  | Node.js | v8.x LTS | $ node -v |
- | Git Installed | | $ git --version |
- | Google Chrome Web Browser | (>60) | click [here](chrome://version/) if Google Chrome is your default browser else copy the link `chrome://version/` in your Chome |
- | Docker latest | Community Edition | $ docker --version |
+ | 安装 Git | | $ git --version |
+ | Google Chrome 浏览器 | (>60) | 如果 Google Chrome 是你的默认浏览器，请点击 [此处](chrome://version/)，否则请复制链接 `chrome://version/` 到 Chome 浏览器中打开 |
+ | 最新版的 Docker | 社区版 | $ docker --version |
  | JDK | v1.8 | $ java -version |
- | Access to an OpenShift cluster | | `oc login -u <username> -p <password> <CLUSTER_URL>` |
- | Text editor such as Atom or Visual Studio Code <br><br> (The exercises were created using `VSCode`, so the screenshots will match its layout and color schemes) | - | - |
+ | 访问 OpenShift 集群 | | `oc login -u <username> -p <password> <CLUSTER_URL>` |
+ | 文本编辑器，比如 Atom，或者 Visual Studio Code <br><br> （练习内容是以 `VSCode` 创建的，所以课件中的截图会与它相匹配）| - | - |
 
 
  <p class="tip">
- <b>NOTE</b> - You will need administrator or super user level access on your system to install the prerequisite software for all the three operating systems.
- Locked down systems with restricted accounts are not supported.
+ <b>提示</b> - 你需要在你的系统中有管理员或超级用户访问权限，以安装所依赖的软件。不支持使用被锁定或权限不足的账号。
  </p>
 
 ### Linux
@@ -169,7 +167,7 @@ mkdir C:\do500-workspace
 docker run -it -v C:/do500-workspace:/home/tool-box/workarea:Z quay.io/redhat/do500-toolbox /bin/bash
 ```
 <p class="tip">
-<b>NOTE</b> - When you launch the container for the very first time, you will be prompted by Docker, as well as the Windows security subsystem to allow read and write access to the ***C:\do500-workspace*** directory. Allow read and write access to this directory by entering your Windows username and password when prompted.
+<b>提示</b> - When you launch the container for the very first time, you will be prompted by Docker, as well as the Windows security subsystem to allow read and write access to the ***C:\do500-workspace*** directory. Allow read and write access to this directory by entering your Windows username and password when prompted.
 </p>
 
 * Once you are inside the container, you can log in to the OpenShift cluster using the OpenShift ***oc*** command-line client, and verify that Ansible is installed:
@@ -182,11 +180,11 @@ bash-4.4$ exit
 
 Your instructor will provide the ***username*** and ***password*** information for the OpenShift cluster when you are ready to run the lab exercises.
 
-## Git and Containers 101
+## Git 与容器基础
  - Git tutorial covering the basics - https://try.github.io/
  - Handy guide for those new to containers - https://developers.redhat.com/blog/2018/02/22/container-terminology-practical-introduction/
 
-## Setup your IDE
+## 设置 IDE
 The following plug-ins are useful for providing syntax highlighting for various lab files:
  - YAML Syntax Highlighter
  - Autosave

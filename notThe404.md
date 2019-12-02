@@ -1,3 +1,3 @@
 ![obi-wan](../images/404/Obi-wan.jpeg)
-# 404 - Page Not Found
-### This is not the page you're looking for, [ move along](/)
+# 404 - 找不到此页
+### 你尝试访问的页面不存在。本页并不是你要找的内容。[回到主页](/)
