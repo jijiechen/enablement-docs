@@ -1,47 +1,47 @@
 # 攻克流水线
 
-> In this exercise we will explore the sample TODO List application and create a pipeline in Jenkins to build and deploy our code.
+> 在这个练习环节，我们将研究一个“TODO List”应用程序，在 Jenkins 中创建流水线，从而对代码进行构建和部署。
 
 ![jenkins-time](../images/exercise2/jenkins-time.jpg)
 [image-ref](https://devrant.com/rants/390132/jenkins-builds)
 
-## Exercise Intro
-This lesson is focused on creating a pipeline for our application. What is a pipeline? A pipeline is a series of steps or stages that takes our code from source to a deployed application. There can be many stages to a pipeline but a simple flow is to run a `build > bake > deploy`. Usually the first stage is triggered by something like a git commit.
+## 练习简介
+本课将关注为应用程序创建流水线。流水线指的是将应用从源代码到最终部署的过程中的一系列步骤或阶段。流水线有可能包含多很阶段，不过一个简单的流水线也可以只包含 `build > bake > deploy` （构建 > 烘焙 > 部署）的简单流程。通常，第一个阶段是由 git 提交之类的事件所触发。
 
-There could be many steps in each of these stages; such as compiling code, running tests and linting. All of these are done to try and drive up code quality and give more assurance that what is deployed is behaving as expected. In the exercise we will create a Jenkins pipeline by configuring it through the Jenkins web UI, which will create an un-gated pathway to production.
+在各个阶段中，又可能有多个步骤；比如编译代码、运行测试和代码检查。这些操作的目的是为了保障产品的质量，并确保部署的内容与预期行为相符。在练习中，我们将通过 Jenkins 界面创建一条 Jenkins 流水线，从而创建一条通往生产环境的免检快车道。
 
-First we will explore the sample application and get it running locally. The sample app is a `todolist` app - the `Hello World` app of the modern day.
+首先，我们先研究一下示例应用，在本地运行它。我们的示例应用是一个 `todolist`（待办事项）应用——它也是现如今一种新的 `Hello World` 应用形态。
 
-#### Why create pipelines
-* Assurance - drive up code quality and remove the need for dedicated deployment / release management teams
-* Freedom - allow developers to take ownership of how and when code gets built and shipped
-* Reliability - pipelines are a bit boring; they execute the same way each and every time they're run!
-* A pathway to production:
-    - Puts the product in the hands of the customer quicker
-    - Enables seamless and repeatable deploys
-    - More prod like infrastructure increases assurance
-    - “We have already done it” behavior de-risks go live
+#### 为什么要创建流水线
+* 保障 - 确保产品质量的同时，不需要引入单独的部署或发布团队
+* 自由 - 让开发人员掌握代码编译的方式和时机的主动性
+* 可靠性 - 流水线过程并不有趣，它每次的执行过程都是相同的
+* 通往生产环境的快车道:
+    - 让产品更快地到达用户手中
+    - 让部署过程可重复，各步骤无缝衔接
+    - 与生产环境更相似的环境可以增加保障
+    - “提前操练”的做法可降低部署生产环境时的风险
 
-## Learning Outcomes
-As a learner by the end of this lesson you will be able to:
+## 学员收获
+作为学员，完成本课程之后，你将能够：
 
-- Build and run the full stack of the TODO List application locally
-- Create an un-gated pipeline using the Jenkins UI for the backend and frontend
-- Add branching to the pipeline to target specific namespaces
+- 在本地完整地构建并运行 TODO List 应用程序
+- 用 Jenkins 界面为前后端创建“免检”流水线
+- 为流水线添加分支支持，从而部署到特定的命名空间
 
-## Tools and Frameworks
-> The following tools are used throughout this exercise. Familiarity with them is not required but knowing what they are may help. You will not need to install Vue or MongoDB. They are taken care of by our `todolist` app.
+## 工具和框架
+> 本练习将用到下列工具。你并不需要对他们完全熟悉，但对它们有所了解会很有帮助。你并不需要安装 Vue 和 MongoDB，它们会由我们的 `todolist` 应用自动管理。
 
-1. [Jenkins](https://jenkins.io/) - OpenSource build automation server; highly customisable through plugins
-2. [Node.js](https://nodejs.org/en/) - Node.js® is a JavaScript runtime built on Chrome's V8 JavaScript engine. Node.js uses an event-driven, non-blocking I/O model that makes it lightweight and efficient. Node.js' package ecosystem, npm, is the largest ecosystem of open source libraries in the world.
-3. [MongoDB](https://www.mongodb.com/what-is-mongodb) - MongoDB stores data in flexible, JSON-like documents, meaning fields can vary from document to document and data structure can be changed over time
-4. [VueJS](https://vuejs.org/) - Vue (pronounced /vjuː/, like view) is a progressive framework for building user interfaces. It is designed from the ground up to be incrementally adoptable, and can easily scale between a library and a framework depending on different use cases. It consists of an approachable core library that focuses on the view layer only, and an ecosystem of supporting libraries that helps you tackle complexity in large Single-Page Applications.
-5. [Jenkins Pipeline](https://jenkins.io/doc/book/pipeline/) - Overview of the Jenkinsfile approach
-6. [Pipeline Syntax](https://jenkins.io/doc/book/pipeline/syntax/) - Documentation for the declarative pipeline
-7. [Groovy](http://groovy-lang.org/) - Groovy is a powerful, optionally typed and dynamic language, with static-typing and static compilation capabilities, for the Java platform aimed at improving developer productivity thanks to a concise, familiar and easy to learn syntax. It integrates smoothly with any Java program, and immediately delivers to your application powerful features, including scripting capabilities, Domain-Specific Language authoring, runtime and compile-time meta-programming and functional programming. Jenkinsfile are written in Groovy but minimal knowledge is required thanks to the Jenkins Pipeline DSL
+1. [Jenkins](https://jenkins.io/) - 开源的构建自动化服务器；基于插件可实现高度定制化
+2. [Node.js](https://nodejs.org/en/) - Node.js® 是一种基于 Chrome 的 V8 JavaScript 引擎的 JavaScript 运行时。Node.js 使用一种事件驱动的、无阻塞的 I/O 模式，因此显得轻量级而高效。Node.js 的包管理系统 npm 是全球最大型的开源库生态系统。
+4. [MongoDB](https://www.mongodb.com/what-is-mongodb) - MongoDB 以一种灵活的、 类 JSON 文档的方式存储数据；这意味着其中每个文档的字段都可以不相同，其数据结构可以持续变更
+5. [VueJS](https://vuejs.org/) - Vue (读作 /vjuː/, 与 view 发音类似) 是一款用于构建用户界面的框架，它本身也处于持续演进中。Vue 本身的设计深深地融入了“渐进式采用”的理念，在不同的场合中，它既可以被用作一个库，也可以被用作一个框架。它由两部分组成：一个专注于视图层的朴实无华的内核库，以及一个由支持性类库构成的生态系统，这些支持性类库可助你应对大型单页应用中的各种复杂性。
+7. [Jenkins Pipeline](https://jenkins.io/doc/book/pipeline/) - 以 Jenkinsfile 的方式构建流水线简介
+8. [Pipeline Syntax](https://jenkins.io/doc/book/pipeline/syntax/) - 声明式流水线的文档
+9. [Groovy](http://groovy-lang.org/) - Groovy 是 Java 平台上一种强大的、可选类型的动态语言，它兼具静态的类型和静态编译能力，其简洁易学的语法大大提高了开发人员的效率。与各种 Java 程序集成后，它可直接为应用增加各种强大的功能，例如脚本编程接口、特定领域专用语言（DSL）的编程平台、运行时和编译期元编程与函数式编程等。Jenkinsfile 就是用 Grovvy 语言编写的，但由于有了 Jenkins 流水线 DSL，因此并不要求你非常了解 Grovvy。
 
-## Big Picture
-> From the previous exercise; we created some supporting tooling needed by our app. Now we will introduce our Sample App and create a pipeline for it
+## 全景图
+> 在前面的练习中，我们为应用创建了一些支持性的工具。现在将开始介绍我们的示例应用，并为其创建流水线。
 
 ![big-picture](../images/big-picture/big-picture-2.jpg)
 
@@ -75,64 +75,63 @@ As a learner by the end of this lesson you will be able to:
 
 2. Verify that both apps and the DB are talking to one another as expected. -->
 
-## Step by Step Instructions
+## 操作步骤
 
-### Part 1 - Explore the Todo List App
-> _In this part of the exercise we will explore the sample application, become familiar with it locally before building and deploying in OCP Land_
+### 一、了解 Todo List 应用
+> _在这个部分，我们将一起了解示例应用，在开展 OCP 中的构建和部署之前，先在本地环境建立对它的了解。_
 
-The Todolist application is a monorepo which has both front end and server layers in a single repo.
+我们的 Todolist 应用程序，是一个单代码库应用（monorepo），也就是说在同一个代码库中存储着前端和后端的各个层次。
 
-1. Run the `che: init-todolist` task in your `dev-pod/main` container to clone the `todolist` code into `/projects` directory
+1. 在容器 `dev-pod/main` 中运行 `che: init-todolist` 任务，从而把 `todolist` 项目的代码克隆到 `/projects` 目录。
 
 ![init-code1](../images/exercise1/init-code2.png)
 
 <p class="tip">
-⛷️ <b>NOTE</b> ⛷️ - If you do not plan on using the cloud IDE you can clone the repository locally from here https://github.com/rht-labs/todolist.git
+⛷️ <b>注意</b> ⛷️ - 如果你不使用云端 IDE，则可以从此处克隆代码库 https://github.com/rht-labs/todolist.git
 </p>
 
-2. Open up GitLab and log in. Create a new project (internal) in GitLab called `todolist` to host your clone of the project and copy its remote address. ![new-gitlab-proj](../images/exercise2/new-gitlab-proj.png)
+2. 打开 GitLab 并登录。创建一个名为 `todolist` 的项目（访问权限选择 internal) 用于存放项目副本，复制其远程地址 ![new-gitlab-proj](../images/exercise2/new-gitlab-proj.png)
 
-3. Later in the exercise we'll automatically trigger Jenkins builds on commit, but we'll add the WebHook now. Add a WebHook to the newly created project by going to Settings > Integrations. ![gitlab-integrations](../images/exercise2/gitlab-integrations.png) 
+3. 在提交代码时自动触发 Jenkins 上的构建的操作在本次练习稍后才进行，不过现在我们先创建 WebHook。进入 Settings > Integrations，为新创建的项目创建 WebHook。![gitlab-integrations](../images/exercise2/gitlab-integrations.png) 
 
-4. In the field add the URL for Jenkins and the route for the webhook and token. Disable SSL Verification if the cluster has unsigned certs and Add the webhook. 
+4. 在界面表单中，填入包含有 Jenkins 网址、WebHook 位置和密钥令牌的 URL；如果集群用的是自签证书，还需要禁用 SSL 验证；最后完成添加 WebHook。
 ```bash
 https://<YOUR_JENKINS_URL>/multibranch-webhook-trigger/invoke?token=todolist
 ```
 
-5. In your local clone of the `todolist`, remove the origin and add the GitLab origin by replacing `<YOUR_GIT_LAB_PROJECT>`. Push your app to GitLab. Use the `Terminal > Open Terminal in specific container` menu item to open a terminal in the `dev-pod/main` container
+5. 使用 `Terminal > Open Terminal in specific container` 菜单命令在 `dev-pod/main` 容器中打开一个终端会话，然后替换下面命令中的 `<YOUR_GIT_LAB_PROJECT>` 的值之后执行，就可以将本地 `todolist` 项目副本中存储的 Git 远端替换为 GitLab 地址，并将应用代码推送到 GitLab。
 
 ```bash
 cd todolist
 git remote set-url origin <YOUR_GIT_LAB_PROJECT>
-# verify the origin has been updated
+# 验证远端信息已更新
 git remote -v
 git push -u origin --all
 ```
 
-6. The `todolist` app has a package.json at the root of the project, this defines the configuration for the app including its dependencies, dev dependencies, scripts and other configuration. Install the app's dependencies
+6. 我们的 `todolist` 应用根目录有一个 `package.json` 文件，它的作用是定义应用的配置，包括它的依赖项、开发过程中的依赖项、脚本，以及其他一些配置。执行下面的命令可以为应用安装依赖：
 ```bash
 npm install
 ```
 
-7. When you are using the cloud hosted environment, you must login to OpenShift from the command line as your user.
-
+7. 如果你使用云端托管环境，就需要在命令行环境中使用你的用户登录到 OpenShift：
 ```bash
 oc login -u <username> -p <password> <CLUSTER_URL>
 ```
 
 <p class="tip">
-️🐇 <b>NOTE</b> 🐇- A bit of black magic here - Run the helper script fixApiUrl
+️🐇 <b>注意</b> 🐇- 这里需要运行的辅助脚本 fixApiUrl 有一点黑魔法。
 </p>
 
-Because we are in a cloud IDE hosted environment, the client side config needs to be updated to use the route that is generated application API. Run the `fixApiUrl` script in your terminal
+由于我们的环境是托管在云中的，因此需要把为我们应用生成的路由更新到客户端配置中的应用 API 中。请在终端环境中运行 `fixApiUrl` 脚本。
 
 <p class="tip">
-🔥 <b>NOTE</b> 🔥 - Make sure that you are in your `workspace*` project while running this command. Otherwise the terminal will crash and the helper function won't help.
+🔥 <b>注意</b> 🔥 - 请确保在运行此命令时，你位于 workspace* 项目，否则的话终端将会崩溃，且脚本不会生效。
 </p>
 
 ![fixApiUrl](../images/exercise2/fixApiUrl.png)
 
-This updates the API endpoint in the `index.js` config file. Before you run the command, it will look like the following.
+这一操作会更新配置文件 `index.js` 中的 API 位置。在执行命令之前，它的内容是：
 
 <kbd>📝 *todolist/src/config/index.js*</kbd>
 ```
@@ -140,11 +139,11 @@ export default {
   todoEndpoint: "/api/todos"
 };
 ```
-Afterwards, you should see something like this:
+而之后，你应该能看到类似这样的情况：
 
 ![fixApiUrl](../images/exercise2/black-magic.png)
 
-8. The `todolist` has some scripts defined in the package.json at the root of the project. A snippet of the npm scripts are shown below. To run any of these scripts run `npm run <SCRIPT_NAME>`.
+8. 我们的 `todolist` 应用在其根目录的 `package.json` 中定义了一些脚本。下面是这些 npm 脚本部分的内容。要运行它们，请执行 `npm run <脚本名称>`.
 <kbd>📝 *todolist/package.json*</kbd>
 ```
   "scripts": {
@@ -158,42 +157,42 @@ Afterwards, you should see something like this:
 ```
 ![npm-scripts](../images/exercise2/npm-scripts.png)
 
-9. Let's start by serving our application and starting the database. Use the `Terminal > Open Terminal in specific container` menu item to open a terminal in the `dev-pod/main` container. Then run the mongo database.
+9. 接下来，我们从启运数据库、运行应用开始。使用菜单 `Terminal > Open Terminal in specific container` 在容器 `dev-pod/main` 中打开一个终端，然后启动 mongo 数据库。
 
 ```bash
 cd todolist
 npm run mongo:start-ide
 ```
 <p class="tip" >
-<b>NOTE</b> - If you're not using the cloud hosted environment, you can start mongo using <i>npm run mongo</i> which will pull the latest `mongo` image from [Docker Hub](https://hub.docker.com/).
+<b>注意</b> - 如果不使用云端托管环境，你也可以通过 <i>npm run mongo</i> 命令来启动 mongo，它会从 [Docker Hub](https://hub.docker.com/) 拉取 `mongo` 镜像。
 </p>
 
-You will get a pop-up in your cloud IDE asking if you want to `add a redirect` that you can close.
+在云 IDE 中，会有一个弹窗问你“是否需要添加重定向”（`add a redirect`），你可以直接关闭它。
 ![close-popup](../images/exercise2/close-popup.png)
 
-10. Use the `Terminal > Open Terminal in specific container` menu item in the cloud IDE to open your second terminal in the `dev-pod/main` container. Now we can run the todolist application.
+10.  在云 IDE 中，通过菜单 `Terminal > Open Terminal in specific container` 在容器 `dev-pod/main` 中再打开一个终端。现在，可以启动我们的 todolist 应用了。
 
 ```bash
 cd todolist
 npm run serve:all
 ```
 
-Once the application starts, we will get an `Open Link` popup that we can select to open the todolist web application
+应用启动完成后，我们就会看到一个有“打开链接”（`Open Link`）的弹窗，点击它可以打开 todolist 应用的页面。
 
 ![8080-popup](../images/exercise2/8080-popup.png)
 
-11. Within the cloud IDE a preview of `todolist` app homepage appears when you start the application
+11. 应用启动后，云 IDE 会出现一个显示 `todolist` 应用首页的预览窗口。
  ![fullstack-app](../images/exercise2/fullstack-app.png)
 
-You can open the preview into a web browser outside of the cloud IDE by clicking on the arrow box next to the url
+点击 URL 旁边的箭头按钮可以在云 IDE 之外的浏览器窗口打开预览页面。
 
 ![open-in-browser](../images/exercise2/open-in-browser.png)
 
 <p class="tip" >
-<b>NOTE</b> - In a local environment you may open the browser (http://localhost:8080) for displaying the homepage.
+<b>注意</b> - 在本地环境中，你可以通过浏览器 (http://localhost:8080) 以打开应用的首页。
 </p>
 
-12. Use the `Terminal > Open Terminal in specific container` menu item in the cloud IDE to open your third terminal in the `dev-pod/main` container. Check things are up and running by testing the API with a `curl`. The API should return some seeded data (stored in `server/config/seed.js`)
+12.  在云 IDE 中，通过菜单 `Terminal > Open Terminal in specific container` 在容器 `dev-pod/main` 中打开第三个终端。请运行一次 `curl` 命令以测试各个服务都运行良好。API 应该返回预置的数据（存储在 `server/config/seed.js`）
 
 ```bash
 cd todolist
@@ -214,13 +213,13 @@ curl -s localhost:9000/api/todos | jq
 }]
 ```
 
-13. Within the cloud IDE a preview of `todolist` app homepage appears when you start the application
+1.  Within the cloud IDE a preview of `todolist` app homepage appears when you start the application
     * Click 'Todo' at the top of the home page to get to the above page.
     * The server hosting live reloads; so if you make changes to your code base the app will live update
 
-14.  The app is a todolist manager built in Vue.js. with a Node.js backend. Play around with the App. You will notice when you add todos they appear and clear as expected. If you refresh the page your todos are persisted.
+2.   The app is a todolist manager built in Vue.js. with a Node.js backend. Play around with the App. You will notice when you add todos they appear and clear as expected. If you refresh the page your todos are persisted.
 
-15.  The structure of the `todolist` is as follows.
+3.   The structure of the `todolist` is as follows.
 ```bash
 todolist
 ├── Dockerfile
@@ -294,7 +293,7 @@ where the following are the important things:
     * `Grunt` is a task runner for use with Node.js projects.
     * `package.json` contains the dependency list and a lot of very helpful scripts for managing the app lifecycle.
 
-16. To prepare Nexus to host the binaries created by the frontend and backend builds we need to run a prepare-nexus script. Before we do this we need to export some variables and change `<YOUR_NAME>` accordingly in the below commands. This is a one time activity and would be automated in a non-training environment.
+1.  To prepare Nexus to host the binaries created by the frontend and backend builds we need to run a prepare-nexus script. Before we do this we need to export some variables and change `<YOUR_NAME>` accordingly in the below commands. This is a one time activity and would be automated in a non-training environment.
 
 ```bash
 oc login -u <username> -p <password> <CLUSTER_URL>
