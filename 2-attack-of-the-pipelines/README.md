@@ -396,7 +396,7 @@ git push
     3. 把打好的包发送到 Nexus
     4. 对工作空间进行持久化存档，以防运行失败状况
     5. 使用 Jenkins 的标签 `${JOB_NAME}.${BUILD_NUMBER}` 标记当前代码库版本
-* 一个*烘焙（bake）*任务，它获取到包，并将其置于 Linux Container 容器中
+* 一个*烘焙（bake）*任务，它把包获取下来，并将其置于 Linux Container 容器中
     1. 从 Nexus 获取二进制，解压缩从而获取其内容
     2. 执行 `oc start-build` 操作以运行构建配置（BuildConfig），并以给定的标签 `${BUILD_TAG}` 标记镜像流（ImageStream）
 * 一个*部署（deploy）*任务，通过更新部署配置（DeploymentConfig）上的镜像标签，将新的变更发布出去：
@@ -481,12 +481,12 @@ BUILD_TAG=${JOB_NAME}.${BUILD_NUMBER}
 
 ![param-trigger-bake](../images/exercise2/param-trigger-bake.png)
 
-3. 这次，我们设置选项 `限制项目的运行节点`（Restrict where this project can be run）的值为 `master`.
+3. 这次，我们设置选项 `限制项目的运行节点`（Restrict where this project can be run）的值为 `master`。
 <p class="tip">
     <b>注意</b> <i>烘焙（bake）</i> 步骤只能在 <i>master</i> 节点上执行，这是因为它拥有烘焙过程中所需的工具。
 </p>
 
-4. 这个任务不需要配置 Git 或其他源代码管理，所以转到下方的构建环境（Build Environment），勾选`构建开始之前先删除工作空间`（Delete workspace before build starts）
+4. 这个任务不需要配置 Git 或其他源代码管理，所以转到下方的构建环境（Build Environment），勾选`构建开始之前先删除工作空间`（Delete workspace before build starts）。
 
 5. 接着转到构建（Build）部分，点击 `添加构建步骤`（Add build step），在下拉列表中选择`执行 Shell`（Execute shell）。在出现的文本框中，输入下列命令（不要忘记替换其中的 `<YOUR_NAME>`），以便从 Nexus 拉取包。我们把 Jenkins 中的标记更新到部署配置（BuildConfig）中，这样可以为产品功能获得从源代码到构建产物的跟踪能力。最后，会运行 `oc start-build` 命令。
 ```bash
@@ -532,41 +532,41 @@ echo "### END DEPLOY IMAGE ###"
 
 #### 三c、流水线
 
-1. Back on Jenkins; We can tie all the jobs in the pipeline together into a nice single view using the Build Pipeline view. Back on the Jenkins home screen Click the + beside the all tab on the top.
+1. 回到 Jenkins，使用构建流水线视图（Build Pipeline View）功能，我们可以把上面的任务串接到一起形成一条流水线，成为一个友好的单一视图。在 Jenkins 首页上，点击顶部标签页右边的加号（+）
 ![add-view](../images/exercise2/add-view.png)
 
-2. On the view that loads; Give the new view a sensible name like `dev-todolist-pipeline` and select Build Pipeline View
+2. 在新出现的页面上，给我们要创建的视图一个有含义的名称，比如 `dev-todolist-pipeline`；然后选择构建流水线视图（Build Pipeline View）。
 ![new-pipeline](../images/exercise2/new-pipeline.png)
 
-3. Set the Pipeline Flow's Inital Job to `dev-todolist-build` and save.
+3. 请将流水线流程中的第一个任务（Inital Job）设置为 `dev-todolist-build` 后保存。
 ![pipeline-flow](../images/exercise2/pipeline-flow.png)
 
-4. You should now see the pipeline view. Run the pipeline by hitting run (you can move onto the next part while it is running as it may take some time).
+4. 你应该能看到一个流水线视图了。点击运行（Run）就可以启动流水线了（由于运行过程需要一段时间，所以你可以先继续后面的步骤）。
 ![dev-pipeline-view](../images/exercise2/dev-pipeline-view.png)
 
 <p class="tip">
-    <b>NOTE</b> - The pipeline may fail on the first run. In such cases, re-run the pipeline once more and the three stages will run successfully and show three green cards.
+    <b>注意</b> - 流水线第一次运行时可能会失败。如果确实如此，请再运行一次，这样三个阶段就都能成功运行，最终显示出绿色的卡片状态。
 </p>
 
-5. To check the deployment in OpenShift; open the web console and go to your `dev` namespace. You should see the deployment was successful; hit the URL to open the app and play with the deployed.
+5. 为了检查应用在 OpenShift 上的部署状态，请打开 OpenShift 控制台并切换到你的 `dev` 命名空间。你应该能够看到部署已成功，点击 URL 可以体验部署成功的应用。
 ![ocp-deployment](../images/exercise2/ocp-deployment.png)
 
-### Part 4 - The Jenkinsfile
-> _In this exercise we'll use pipeline-as-code to create a pipeline in Jenkins_
+### 四、Jenkinsfile
+> _在这个练习中，我们要使用流水线即代码的方式在 Jenkins 中创建流水线_
 
-1. Open up your `todolist` application in your cloud IDE and move to the `Jenkinsfile` in the root of the project. The high-level structure of the file is shown collapsed below.
+1. 在云 IDE 中打开你的 `todolist` 应用，并打开根目录的 `Jenkinsfile` 文件。下面是这个文件折叠起来的结构：
 ![pipeline-overview](../images/exercise4/pipeline-overview.png)
-Some of the key things to note:
-    * `pipeline {}` is how all declarative Jenkins pipelines begin.
-    * `environment {}` defines environment variables to be used across all build stages
-    * `options {}` contains specific Job specs you want to run globally across the jobs e.g. setting the terminal colour
-    * `stage {}` all jobs must have one stage. This is the logical part of the build that will be executed e.g. `bake-image`
-    * `steps {}` each `stage` has one or more steps involved. These could be execute shell or git checkout etc.
-    * `agent {}` specifies the node the build should be run on e.g. `jenkins-slave-npm`
-    * `post {}` hook is used to specify the post-build-actions. Jenkins declarative pipeline syntax provides very useful callbacks for `success`, `failure` and `always` which are useful for controlling the job flow
-    * `when {}` is used for flow control. It can be used at the stage level and be used to stop pipeline entering that stage. e.g. when branch is master; deploy to `test` environment.
+其中有一些关键的信息:
+    * `pipeline {}` 是声明式 Jenkins 流水线的顶层结构
+    * `environment {}` 定义在所有构建阶段中都可以使用的环境变量
+    * `options {}` 包含在任务执行过程中的全局设置，比如设置控制台的颜色
+    * `stage {}` 每个任务（阶段）对应一个 `stage`。 这就是构建真正执行的逻辑，比如 `bake-image`
+    * `steps {}` 每个 `stage` 可以有一个或多个`steps`。它们可以是执行 Shell 或者检出 Git 等。
+    * `agent {}` 指定构建运行所在的节点，比如 `jenkins-slave-npm`
+    * `post {}` 构建后勾子可用于指定构建后操作。Jenkins 声明式流水线语法为 `success`（成功）、`failure` （失败）以及 `always`（每次）等情况都提供非常好用的回调，这对控制任务流程非常有用
+    * `when {}` 用于控制流程。它可以用于 `stage` 级别并用于让流水线不进入对应的阶段，比如当分支位于 `master` 时，部署到 `test` 环境。
     
-2. The Jenkinsfile is mostly complete, however some minor changes will be needed to orchestrate namespaces. Find and replace all instances of `<YOUR_NAME>` in the Jenkinsfile. Update the `<GITLAB_USERNAME>` to the one you log in to the cluster with; this variable is used in the namespace of your Git projects when checking out code etc. Replace `<GITLAB_FQDN>` with your Git domain (only the hostname, without `https://` or the repository name).
+2. 我们的 Jenkinsfile 大部分内容已经完成，不过还需要少量一些工作来安排命名空间。请查找并替换 Jenkinsfile 中所有的 `<YOUR_NAME>`；将 `<GITLAB_USERNAME>` 的值改为登录集群所用的用户名，它会在检出代码等操作时用到；将 `<GITLAB_FQDN>` 替换为你 GitLab 的域名（只包括域名的部分，不包括 `https://`，也不包括代码仓库的名称）。
 
 <kbd>📝 *todolist/Jenkinsfile*</kbd>
 ```groovy
@@ -589,7 +589,7 @@ Some of the key things to note:
     }
 ```
 
-3. With these changes in place, push your changes to the `develop` branch.
+3. 更改完成之后，向 `develop` 分支推送你的变更。
 ```bash
 git add Jenkinsfile
 ```
@@ -600,31 +600,31 @@ git commit -m "ADD - namespace and git repo to pipeline"
 git push
 ```
 
-4. When the changes have been successfully pushed; Open Jenkins.
+4. 完成变更的推送之后，请打开 Jenkins。
 
-5. Create a `New Item` on Jenkins. Give it the name `todolist` and select `Multibranch Pipeline` from the bottom of the list as the job type.
+5. 在 Jenkins 上，创建一个新的任务（New Item），命名为 `todolist`，并选择列表底部的 `多分支流水线`（Multibranch Pipeline）作为任务类型。
 ![multibranch-select](../images/exercise4/multibranch-select.png)
 
-6. On the job's configure page; set the Branch Sources to `git`
+6. 在任务的配置页上，将分支源（Branch Sources）设置为 `git`
 ![multibranch-select-git](../images/exercise4/multibranch-select-git.png)
 
-7. Fill in the Git settings with your `todolist` GitLab url and set the credentials as you've done before. `https://gitlab.<APPS_URL>/<YOUR_NAME>/todolist.git`
+7. 在设置中，填入 GitLab 上的 `todolist` 项目的 URL，以及按照之前的方式设置凭据 `https://gitlab.<APPS_URL>/<YOUR_NAME>/todolist.git`
 ![multibranch-git](../images/exercise4/multibranch-git.png)
 
-8. Set the `Scan Multibranch Pipeline Triggers` to be Scan by webhook and set the token to be `todolist` as we set at the beginning of the exercise. This will trigger the job to scan for changes in the repo when there are pushes. 
+8. 将 `扫描多分支流水线触发器`（Scan Multibranch Pipeline Triggers）设置为 `由 Web 钩子扫描`（Scan by webhook），并将令牌（token）设置为 `todolist`，这也是我们在练习一开始时设置的值。它的作用是在有新变更推送到代码库时，触发任务的扫描获得新的变更。
 ![multibranch-webhook](../images/exercise2/multibranch-webhook.png)
 
-9.  Save the Job configuration to run the intial scan. The log will show scans for `master` and `develop` branches, which have `Jenkinsfile` so pipelines are dynamically created for them.
+9. 保存任务的配置信息，以便运行首次的扫描。日志信息会显示针对 `master` 和 `develop` 分支的扫描操作，因为它们都有 `Jenkinsfile`，于是 Jenkins 会为它们动态地创建流水线。
 ![todolist-api-multi](../images/exercise2/todolist-api-multi.png)
 
-10.  The pipeline file is setup to only run `bake` & `deploy` stages when on `master` or `develop` branch. This is to provide us with very fast feedback for team members working on feature or bug fix branches. Each time someone commits or creates a new branch a basic build with testing occurs to give very rapid feedback to the team. 
+10.  流水线文件里已设置，当位于 `master` 或者 `develop` 分支时， 只运行 `bake` 和 `deploy` 阶段。这是为了给工作在功能开发和缺陷修复的各个分支上的开发人员提供快速的反馈。每当有人提交时，或者创建了新的分支时，就会运行包括测试的基础构建，从而给团队一种非常快速的反馈。
 
-11.  With the builds running for  `develop` and `master` we can explore the Blue Ocean View for Jenkins. On the Job overview page, hit the `Open Blue Ocean` button on the side to see what modern Jenkins looks like.
+11. 在 `develop` 和 `master` 分支的构建运行成功之后，我们可以了解一下 Jenkins 的 Blue Ocean 视图。在任务的概要页，点击边栏上的 `Open Blue Ocean` 按钮，来查看 Jenkins 的现代化视图。
 ![blue-ocean-todolist](../images/exercise2/blue-ocean-todolist.png)
 
 _____
 
-## Extension Tasks
+## 扩展任务
 > _Ideas for go-getters. Advanced topic for doers to get on with if they finish early. These will usually not have a solution available and are provided for additional scope._
 
 - Pipeline Tasks:
