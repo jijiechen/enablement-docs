@@ -144,6 +144,7 @@ export default {
 ![fixApiUrl](../images/exercise2/black-magic.png)
 
 8. 我们的 `todolist` 应用在其根目录的 `package.json` 中定义了一些脚本。下面是这些 npm 脚本部分的内容。要运行它们，请执行 `npm run <脚本名称>`.
+
 <kbd>📝 *todolist/package.json*</kbd>
 ```
   "scripts": {
@@ -189,10 +190,10 @@ npm run serve:all
 ![open-in-browser](../images/exercise2/open-in-browser.png)
 
 <p class="tip" >
-<b>注意</b> - 在本地环境中，你可以通过浏览器 (http://localhost:8080) 以打开应用的首页。
+<b>注意</b> - 在本地环境中，你可以通过浏览器 (http://localhost:8080) 打开应用的首页。
 </p>
 
-12.  在云 IDE 中，通过菜单 `Terminal > Open Terminal in specific container` 在容器 `dev-pod/main` 中打开第三个终端。请运行一次 `curl` 命令以测试各个服务都运行良好。API 应该返回预置的数据（存储在 `server/config/seed.js`）
+12.  在云 IDE 中，通过菜单 `Terminal > Open Terminal in specific container` 在容器 `dev-pod/main` 中打开第三个终端。请运行一次 `curl` 命令以测试各个服务都运行良好。API 应该返回预置的数据（存储在文件 `server/config/seed.js` 中）
 
 ```bash
 cd todolist
@@ -406,20 +407,24 @@ git push
 
 #### 三a、构建
 
-1. With the BuildConfig and DeployConfig in place for both the app from previous steps; Log into Jenkins and create a `New Item`. This is just jenkins speak for a new job configuration.<br><br> ![new-item](../images/exercise2/new-item.png)
+1. 在前面的步骤中，我们已经创建了构建配置（BuildConfig）和部署配置（DeployConfig）。现在请登录 Jenkins，并创建新项目（`New Item`），这是 Jenkins 对新任务的称谓。<br><br> ![new-item](../images/exercise2/new-item.png)
 
-2. Name this job `dev-todolist-build` and select `Freestyle Project`. Our job will take the form of `<ENV>-<APP_NAME>-<JOB_FUNCTION>`. ![freestyle-job](../images/exercise2/freestyle-job.png)
+2. 创建时，任务的名称为 `dev-todolist-build`，选择`自由风格的项目`（Freestyle Project）。我们任务名称一般使用 `<环境名>-<应用名>-<任务功能>` 的格式。
+![freestyle-job](../images/exercise2/freestyle-job.png)
 
-3. The page that loads is the Job Configuration page and it can be returned to at anytime from Jenkins. Let's start configuring our job. To conserve space; we will make sure Jenkins only keeps the last build's artifacts. Tick the `Discard old builds` checkbox, then `Advanced` and set `Max # of builds to keep with artifacts` to 1 as indicated below
+3. 接下来的页面是任务配置，你稍后在 Jenkins 中还可以随时回到这个页面。接下来我们开始配置这个任务。 为了节省一些的空间，我们让 Jenkins 只保留最后一次构建的产物。请勾选`丢弃旧的构建`（Discard old builds）选项，点击`高级`（Advanced），并设置`发布包最大保留#个构建`（Max # of builds to keep with artifacts），设置为 1。
 ![keep-artifacts](../images/exercise2/keep-artifacts.png)
 
-4. Our Node.js build needs to be run on the `jenkins-slave-npm` we bought in in the previous chapter. Specify this in the box labelled `Restrict where this project can be run` ![label-jenkins-slave](../images/exercise2/label-jenkins-slave.png)
+4. 我们的 Node.js 构建过程需要在我们在一上章中构建的 `jenkins-slave-npm` 中运行。请在文本框 `限制项目的运行节点`（Restrict where this project can be run）进行设置。
+![label-jenkins-slave](../images/exercise2/label-jenkins-slave.png)
 
-5. On the Source Code Management tab, select the Git radio button, specify the endpoint for our GitLab `todolist` Project and specify your credentials (`<YOUR_NAME>-ci-cd-gitlab-auth`) from the dropdown box. Set the Branch Specifier to `develop`. ![git-scm](../images/exercise2/git-scm.png)
+5. 在源代码管理区域，请选择 Git，填入 `todolist` 项目在 GitLab 上的地址，并从下拉列表中选择你的凭据（名称为`<YOUR_NAME>-ci-cd-gitlab-auth`），将分支设置为 `develop`。
+![git-scm](../images/exercise2/git-scm.png)
 
-6. Scroll down to the Build Environment tab and select the `Color ANSI Console Output` checkbox ![ansi](../images/exercise2/ansi.png)
+6. 向下滚动到构建环境（Build Environment）标签页，勾选选项 `Color ANSI Console Output`。
+![ansi](../images/exercise2/ansi.png)
 
-7. Move on to the Build section and select `Add build step`. From the dropdown select `Execute shell`. On the box that appears; insert the following, to build package and deploy our app to Nexus:
+7.  转到构建部分，选择`添加构建部步骤`（Add build step），在下拉列表中选择`执行 Shell`（Execute shell）。在出现的文本框中，输入以下内容，以便为应用打包并发送到 Nexus。
 ```bash
 set -o xtrace
 npm install
@@ -429,38 +434,39 @@ npm run publish
 ```
 ![build-step](../images/exercise2/build-step.png)
 
-8. Scroll to the final section; the Post-build Actions. Add a new post-build action from the dropdown called `Archive the artifacts` and specify `**` in the box. This will zip the entire workspace and copy it back to Jenkins for inspection if needed. ![archive-artifacts](../images/exercise2/archive-artifacts.png)
+8. 滚动到底部的构建后操作（Post-build Actions）部分。从下拉列表中选择名为 `归档发布包`（Archive the artifacts）的构建后操作，并在出现的文本框中填写 `**` 。这样就可以压缩整个工作空间，以便在需要时恢复给 Jenkins 用于检查。
+![archive-artifacts](../images/exercise2/archive-artifacts.png)
 
-9. On the Post-build Actions; Add another post-build action from the dropdown called `Git Publisher`. This is useful for tying the git check-in to the feature in your tracking tool to the built product.
-    * Tick the box `Push Only If Build Succeeds`
-    * Add the Tag to push of
+9. 还是构建后操作（Post-build Actions），从下拉列表中添加另一个名为 `Git 发布器`（Git Publisher）的构建后操作。它通常用于从构建工具向源代码管理工具以 Git 签入的方式保存信息。
+    * 勾选选项`仅成功时才推送`（Push Only If Build Succeeds）
+    * 指定推送标签（Tag）为：
 ```bash
 ${JOB_NAME}.${BUILD_NUMBER}
 ```
-    * Specify the commit message to be
+    * 指定提交消息（commit message）为：
 ```bash
 Automated commit by jenkins from ${JOB_NAME}.${BUILD_NUMBER}
 ```
 
-    * Check `Create New Tag` and set `Target remote name` to `origin`
+    * 勾选选项 `创建新标签`（Create New Tag），并把 `目标远端名称`（Target remote name）设置为 `origin`
 ![git-publisher](../images/exercise2/git-publisher.png)
 
-10. Finally; add the trigger for the next job in the pipeline. This is to trigger the bake job with the current build tag. Add another post-build action from the dropdown called `Trigger parameterized build on other projects`.
-    * Set the project to build to be `dev-todolist-bake-deploy`
-    * Set the condition to be `Stable or unstable but not failed`
-    * Click Add Parameters dropdown and select Predefined parameters.
-    * In the box, insert our BUILD_TAG as follows
+10.  最后一步，为流水线的下一个任务配置触发器，其目的是使用当前的构建标记触发烘焙任务。再添加一个构建后操作，并在下拉列表中选择 `触发其他工程中的参数化构建`（Trigger parameterized build on other projects）。
+    * 设置要构建的工程（Project to trigger）为 `dev-todolist-bake-deploy`
+    * 设置触发条件（Condition）为 `稳定或不稳定但不失败`（Stable or unstable but not failed）
+    * 点击添加参数（Add Parameters），并选择预定义的参数（Predefined parameters）
+    * 在文本框中，以下面的方式输入我们的构建标记（BUILD_TAG）：
 ```bash
 BUILD_TAG=${JOB_NAME}.${BUILD_NUMBER}
 ```
 ![param-trigger](../images/exercise2/param-trigger.png)
 <p class="tip">
-    <b>NOTE</b> - Jenkins might say "No such project ‘dev-todolist-bake-deploy’. Did you mean ...." at this point. Don't worry; it's because we have not created the next job yet.
+    <b>注意</b> - 这里 Jenkins 可能会提示“没有这个工程...你指定是...”（No such project...Did you mean...）。无需担心，这是因为我们还没有创建下一个任务。
 </p>
 
-11. Hit `save` which will take you to the job overview page - and that's it; our *build* phase is complete!
+11.   点击`保存`（Save）后，你将能看到任务的概要页。这样我们就完成了*构建（Build）*阶段的设置工作。
 
-#### 3b - bake & deploy
+#### 三b - bake & deploy
 
 1. Next we will setup our *bake* and *deploy* phase; which is a little simpler. Go to Jenkins home and create another Freestyle Job (as before) called `dev-todolist-bake-deploy`.
 
