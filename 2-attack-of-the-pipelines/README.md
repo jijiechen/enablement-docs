@@ -38,10 +38,10 @@
 5. [VueJS](https://vuejs.org/) - Vue (读作 /vjuː/, 与 view 发音类似) 是一款用于构建用户界面的框架，它本身也处于持续演进中。Vue 本身的设计深深地融入了“渐进式采用”的理念，在不同的场合中，它既可以被用作一个库，也可以被用作一个框架。它由两部分组成：一个专注于视图层的朴实无华的内核库，以及一个由支持性类库构成的生态系统，这些支持性类库可助你应对大型单页应用中的各种复杂性。
 7. [Jenkins Pipeline](https://jenkins.io/doc/book/pipeline/) - 以 Jenkinsfile 的方式构建流水线简介
 8. [Pipeline Syntax](https://jenkins.io/doc/book/pipeline/syntax/) - 声明式流水线的文档
-9. [Groovy](http://groovy-lang.org/) - Groovy 是 Java 平台上一种强大的、可选类型的动态语言，它兼具静态的类型和静态编译能力，其简洁易学的语法大大提高了开发人员的效率。与各种 Java 程序集成后，它可直接为应用增加各种强大的功能，例如脚本编程接口、特定领域专用语言（DSL）的编程平台、运行时和编译期元编程与函数式编程等。Jenkinsfile 就是用 Grovvy 语言编写的，但由于有了 Jenkins 流水线 DSL，因此并不要求你非常了解 Grovvy
+9. [Groovy](http://groovy-lang.org/) - Groovy 是 Java 平台上一种强大的、可选类型的动态语言，它兼具静态类型和静态编译能力，其简洁易学的语法大大提高了开发人员的效率。与各种 Java 程序集成后，它可直接为应用增加各种强大的功能，例如脚本编程接口、特定领域专用语言（DSL）的编程平台、运行期和编译期元编程与函数式编程等。Jenkinsfile 就是用 Grovvy 语言编写的，但得益于 Jenkins 流水线 DSL，这里并不要求你非常了解 Grovvy
 
 ## 全景图
-> 在前面的练习中，我们为应用创建了一些支持性的工具。现在将开始介绍我们的示例应用，并为其创建流水线。
+> 在前面的练习中，我们为应用创建了一些支持性的工具。现在我们开始介绍我们的示例应用，并为其创建流水线。
 
 ![big-picture](../images/big-picture/big-picture-2.jpg)
 
@@ -409,10 +409,10 @@ git push
 
 1. 在前面的步骤中，我们已经创建了构建配置（BuildConfig）和部署配置（DeployConfig）。现在请登录 Jenkins，并创建新项目（`New Item`），这是 Jenkins 对新任务的称谓。<br><br> ![new-item](../images/exercise2/new-item.png)
 
-2. 创建时，任务的名称为 `dev-todolist-build`，选择`自由风格的项目`（Freestyle Project）。我们任务名称一般使用 `<环境名>-<应用名>-<任务功能>` 的格式。
+2. 创建时，设置任务的名称为 `dev-todolist-build`，选择`自由风格的项目`（Freestyle Project）。我们的任务名称一般使用 `<环境名>-<应用名>-<任务功能>` 的格式。
 ![freestyle-job](../images/exercise2/freestyle-job.png)
 
-3. 接下来的页面是任务配置，你稍后在 Jenkins 中还可以随时回到这个页面。接下来我们开始配置这个任务。 为了节省一些的空间，我们让 Jenkins 只保留最后一次构建的产物。请勾选`丢弃旧的构建`（Discard old builds）选项，点击`高级`（Advanced），并设置`发布包最大保留#个构建`（Max # of builds to keep with artifacts），设置为 1。
+3. 接下来是任务配置页，稍后在 Jenkins 中你还可以随时回到这个页面。接下来我们开始配置这个任务。 为了节省一些的空间，我们让 Jenkins 只保留最后一次构建的产物。请勾选`丢弃旧的构建`（Discard old builds）选项，点击`高级`（Advanced），并将 `发布包最大保留#个构建`（Max # of builds to keep with artifacts），设置为 1。
 ![keep-artifacts](../images/exercise2/keep-artifacts.png)
 
 4. 我们的 Node.js 构建过程需要在我们在一上章中构建的 `jenkins-slave-npm` 中运行。请在文本框 `限制项目的运行节点`（Restrict where this project can be run）进行设置。
@@ -424,7 +424,7 @@ git push
 6. 向下滚动到构建环境（Build Environment）标签页，勾选选项 `Color ANSI Console Output`。
 ![ansi](../images/exercise2/ansi.png)
 
-7.  转到构建部分，选择`添加构建部步骤`（Add build step），在下拉列表中选择`执行 Shell`（Execute shell）。在出现的文本框中，输入以下内容，以便为应用打包并发送到 Nexus。
+7.  转到构建部分，选择`添加构建步骤`（Add build step），在下拉列表中选择`执行 Shell`（Execute shell）。在出现的文本框中，输入以下内容，以便为应用打包并发送到 Nexus。
 ```bash
 set -o xtrace
 npm install
@@ -439,11 +439,11 @@ npm run publish
 
 9. 还是构建后操作（Post-build Actions），从下拉列表中添加另一个名为 `Git 发布器`（Git Publisher）的构建后操作。它通常用于从构建工具向源代码管理工具以 Git 签入的方式保存信息。
     * 勾选选项`仅成功时才推送`（Push Only If Build Succeeds）
-    * 指定推送标签（Tag）为：
+    * 指定推送标签（Tag to push）为：
 ```bash
 ${JOB_NAME}.${BUILD_NUMBER}
 ```
-    * 指定提交消息（commit message）为：
+    * 指定提交消息（Tag message）为：
 ```bash
 Automated commit by jenkins from ${JOB_NAME}.${BUILD_NUMBER}
 ```
@@ -452,8 +452,8 @@ Automated commit by jenkins from ${JOB_NAME}.${BUILD_NUMBER}
 ![git-publisher](../images/exercise2/git-publisher.png)
 
 10.  最后一步，为流水线的下一个任务配置触发器，其目的是使用当前的构建标记触发烘焙任务。再添加一个构建后操作，并在下拉列表中选择 `触发其他工程中的参数化构建`（Trigger parameterized build on other projects）。
-    * 设置要构建的工程（Project to trigger）为 `dev-todolist-bake-deploy`
-    * 设置触发条件（Condition）为 `稳定或不稳定但不失败`（Stable or unstable but not failed）
+    * 设置要构建的工程（Project to build）为 `dev-todolist-bake-deploy`
+    * 设置触发条件（Trigger when）为 `稳定或不稳定但不失败`（Stable or unstable but not failed）
     * 点击添加参数（Add Parameters），并选择预定义的参数（Predefined parameters）
     * 在文本框中，以下面的方式输入我们的构建标记（BUILD_TAG）：
 ```bash
@@ -461,35 +461,34 @@ BUILD_TAG=${JOB_NAME}.${BUILD_NUMBER}
 ```
 ![param-trigger](../images/exercise2/param-trigger.png)
 <p class="tip">
-    <b>注意</b> - 这里 Jenkins 可能会提示“没有这个工程...你指定是...”（No such project...Did you mean...）。无需担心，这是因为我们还没有创建下一个任务。
+    <b>注意</b> - 在这里 Jenkins 可能会提示“没有这个工程...你指定是...”（No such project...Did you mean...）。无需担心，这是因为我们还没有创建下一个任务。
 </p>
 
 11.   点击`保存`（Save）后，你将能看到任务的概要页。这样我们就完成了*构建（Build）*阶段的设置工作。
 
-#### 三b - bake & deploy
+#### 三b、烘焙与部署
 
-1. Next we will setup our *bake* and *deploy* phase; which is a little simpler. Go to Jenkins home and create another Freestyle Job (as before) called `dev-todolist-bake-deploy`.
+1. 接下来，我们来设置*烘焙（bake）*和*部署（deploy）*阶段，具体过程会简单一些。打开 Jenkins 首页，再创建一个自由风格（Freestyle）的任务，命名为`dev-todolist-bake-deploy`。
 
-2. This job will take in the BUILD_TAG from the previous one so check the `This project is parameterized` box on the General tab.
-    * Add string parameter type
-    * set the Name to `BUILD_TAG`. This will be available to the job as an Enviroment Variable.
-    * You can set `dev-todolist-build.` as the default value for ease when triggering manually.
-    * The description is not required but a handy one for reference would be `${JOB_NAME}.${BUILD_NUMBER} of previous build e.g. dev-todolist-build.1232`
+2. 此任务需要使用从前序构建中获取的 `BUILD_TAG`，因此，请在通用（General）标签页勾选选项 `此工程是参数化工程`（This project is parameterized）。
+    * 添加一个字符串参数（String parameter）
+    * 把名称（Name）设置为 `BUILD_TAG`。它会以环境变量的方式提供给任务的执行过程使用
+    * 可以把 `dev-todolist-build.` 设置为它的默认值（default value）供手动触发时使用
+    * 描述（description）并不是必须填写的，不过作为操作提示，可以使用 `前序构建的 任务名称.构建序号 ${JOB_NAME}.${BUILD_NUMBER}  比如 dev-todolist-build.1232`
 <p class="tip">
-    <b>NOTE</b> - Don't forget to include the <i>.</i> after <i>dev-todolist-build</i> in the Default Value box.
+    <b>注意</b> - 不要忽略了默认值 <i>dev-todolist-build</i> 之后的点（<i>.</i>）
 </p>
 
 ![param-trigger-bake](../images/exercise2/param-trigger-bake.png)
 
-3. This time set the `Restrict where this project can be run` label to `master`.
+3. 这次，我们设置选项 `限制项目的运行节点`（Restrict where this project can be run）的值为 `master`.
 <p class="tip">
-    <b>NOTE</b> The <i>bake</i> step can only be executed on the <i>master</i> node because it contains the tools for baking.
+    <b>注意</b> <i>烘焙（bake）</i> 步骤只能在 <i>master</i> 节点上执行，这是因为它拥有烘焙过程中所需的工具。
 </p>
 
-4. There is no Git or SCM needed for this job so move down to the Build Environment and tick `Delete workspace before build starts`
+4. 这个任务不需要配置 Git 或其他源代码管理，所以转到下方的构建环境（Build Environment），勾选`构建开始之前先删除工作空间`（Delete workspace before build starts）
 
-5. Move on to the Build section and select `Add build step`. From the dropdown select `Execute shell`. On the box the appears; insert the following, to pull the package from Nexus. We patch the BuildConfig with the Jenkins Tag to get traceablility from feature to source code to built item. Finally; the oc start-build command is run:
-Remember to replace `<YOUR_NAME>` accordingly.
+5. 接着转到构建（Build）部分，点击 `添加构建步骤`（Add build step），在下拉列表中选择`执行 Shell`（Execute shell）。在出现的文本框中，输入下列命令（不要忘记替换其中的 `<YOUR_NAME>`），以便从 Nexus 拉取包。我们把 Jenkins 中的标记更新到部署配置（BuildConfig）中，这样可以为产品功能获得从源代码到构建产物的跟踪能力。最后，会运行 `oc start-build` 命令。
 ```bash
 #!/bin/bash
 set -o xtrace
@@ -506,7 +505,7 @@ echo "### END BAKE IMAGE ###"
 ```
 ![bake-step](../images/exercise2/bake-step.png)
 
-6. Hit `Add build step` again and from the dropdown select `Execute shell`. Enter the following text and remember to change `<YOUR_NAME>` accordingly.
+6. 再次点击 `添加构建步骤`（Add build step），从下拉列表中选择 `执行 Shell`（Execute shell）并输入以下命令，不要忘记替换其中的 `<YOUR_NAME>`。
 ```bash
 #!/bin/bash
 set -o xtrace
@@ -523,15 +522,15 @@ echo "### END DEPLOY IMAGE ###"
 ```
 ![deploy-step](../images/exercise2/deploy-step.png)
 
-7. When a deployment has completed; OpenShift can verify its success. Add another step by clicking the `Add build step` on the Build tab then `Verify OpenShift Deployment` including the following:
-    * Set the Project to your `<YOUR_NAME>-dev`
-    * Set the DeploymentConfig to your app's name `todolist`
-    * Set the replica count to `1`
+7. 部署完成之后，OpenShift 可以验证其是否成功。下面我们再添加一个步骤：在构建（Build）标签页点击 `添加构建步骤`（Add build step），从下拉列表中选择 `验证 OpenShift 部署`（Verify OpenShift Deployment），并设置：
+    * 将项目名称（Project）设置为你对应的 `<YOUR_NAME>-dev`
+    * 将部署配置（DeploymentConfig）设置为应用的名称 `todolist`
+    * 将副本数量（replica count）设置为 `1`
 ![verify-deployment](../images/exercise2/verify-deployment.png)
 
-8.  Hit `save` which will take you to the job overview page.
+8.  点击`保存`（Save）后，你将转到任务概要页。
 
-#### 3c - Pipeline
+#### 三c、流水线
 
 1. Back on Jenkins; We can tie all the jobs in the pipeline together into a nice single view using the Build Pipeline view. Back on the Jenkins home screen Click the + beside the all tab on the top.
 ![add-view](../images/exercise2/add-view.png)
