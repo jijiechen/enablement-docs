@@ -6,7 +6,7 @@
 [image-ref](https://devrant.com/rants/390132/jenkins-builds)
 
 ## 练习简介
-本课将关注为应用程序创建流水线。流水线指的是将应用从源代码到最终部署的过程中的一系列步骤或阶段。流水线有可能包含多很阶段，不过一个简单的流水线也可以只包含 `build > bake > deploy` （构建 > 烘焙 > 部署）的简单流程。通常，第一个阶段是由 git 提交之类的事件所触发。
+本课将关注为应用程序创建流水线。流水线指的是将应用从源代码到最终部署的过程中的一系列步骤或阶段。流水线有可能包含多很阶段，不过一个简单的流水线也可以只包含 *构建 > 烘焙 > 部署*（`build > bake > deploy`）的简单流程。通常，第一个阶段是由 git 提交之类的事件所触发。
 
 在各个阶段中，又可能有多个步骤；比如编译代码、运行测试和代码检查。这些操作的目的是为了保障产品的质量，并确保部署的内容与预期行为相符。在练习中，我们将通过 Jenkins 界面创建一条 Jenkins 流水线，从而创建一条通往生产环境的免检快车道。
 
@@ -38,7 +38,7 @@
 5. [VueJS](https://vuejs.org/) - Vue (读作 /vjuː/, 与 view 发音类似) 是一款用于构建用户界面的框架，它本身也处于持续演进中。Vue 本身的设计深深地融入了“渐进式采用”的理念，在不同的场合中，它既可以被用作一个库，也可以被用作一个框架。它由两部分组成：一个专注于视图层的朴实无华的内核库，以及一个由支持性类库构成的生态系统，这些支持性类库可助你应对大型单页应用中的各种复杂性。
 7. [Jenkins Pipeline](https://jenkins.io/doc/book/pipeline/) - 以 Jenkinsfile 的方式构建流水线简介
 8. [Pipeline Syntax](https://jenkins.io/doc/book/pipeline/syntax/) - 声明式流水线的文档
-9. [Groovy](http://groovy-lang.org/) - Groovy 是 Java 平台上一种强大的、可选类型的动态语言，它兼具静态的类型和静态编译能力，其简洁易学的语法大大提高了开发人员的效率。与各种 Java 程序集成后，它可直接为应用增加各种强大的功能，例如脚本编程接口、特定领域专用语言（DSL）的编程平台、运行时和编译期元编程与函数式编程等。Jenkinsfile 就是用 Grovvy 语言编写的，但由于有了 Jenkins 流水线 DSL，因此并不要求你非常了解 Grovvy。
+9. [Groovy](http://groovy-lang.org/) - Groovy 是 Java 平台上一种强大的、可选类型的动态语言，它兼具静态的类型和静态编译能力，其简洁易学的语法大大提高了开发人员的效率。与各种 Java 程序集成后，它可直接为应用增加各种强大的功能，例如脚本编程接口、特定领域专用语言（DSL）的编程平台、运行时和编译期元编程与函数式编程等。Jenkinsfile 就是用 Grovvy 语言编写的，但由于有了 Jenkins 流水线 DSL，因此并不要求你非常了解 Grovvy
 
 ## 全景图
 > 在前面的练习中，我们为应用创建了一些支持性的工具。现在将开始介绍我们的示例应用，并为其创建流水线。
@@ -164,13 +164,13 @@ cd todolist
 npm run mongo:start-ide
 ```
 <p class="tip" >
-<b>注意</b> - 如果不使用云端托管环境，你也可以通过 <i>npm run mongo</i> 命令来启动 mongo，它会从 [Docker Hub](https://hub.docker.com/) 拉取 `mongo` 镜像。
+<b>注意</b> - 如果不使用云端托管环境，你也可以通过 <i>npm run mongo</i> 命令来启动 mongo，它会从 <a href="https://hub.docker.com/">Docker Hub</a> 拉取 <i>mongo</i> 镜像。
 </p>
 
-在云 IDE 中，会有一个弹窗问你“是否需要添加重定向”（`add a redirect`），你可以直接关闭它。
+在云 IDE 中，会出现一个弹窗问你“是否需要添加重定向”（`add a redirect`），你可以直接关闭它。
 ![close-popup](../images/exercise2/close-popup.png)
 
-10.  在云 IDE 中，通过菜单 `Terminal > Open Terminal in specific container` 在容器 `dev-pod/main` 中再打开一个终端。现在，可以启动我们的 todolist 应用了。
+10. 在云 IDE 中，通过菜单 `Terminal > Open Terminal in specific container` 在容器 `dev-pod/main` 中再打开一个终端。现在，可以启动我们的 todolist 应用了。
 
 ```bash
 cd todolist
@@ -181,7 +181,7 @@ npm run serve:all
 
 ![8080-popup](../images/exercise2/8080-popup.png)
 
-11. 应用启动后，云 IDE 会出现一个显示 `todolist` 应用首页的预览窗口。
+11.  应用启动后，云 IDE 会出现一个显示 `todolist` 应用首页的预览窗口。
  ![fullstack-app](../images/exercise2/fullstack-app.png)
 
 点击 URL 旁边的箭头按钮可以在云 IDE 之外的浏览器窗口打开预览页面。
@@ -213,13 +213,13 @@ curl -s localhost:9000/api/todos | jq
 }]
 ```
 
-1.  Within the cloud IDE a preview of `todolist` app homepage appears when you start the application
-    * Click 'Todo' at the top of the home page to get to the above page.
-    * The server hosting live reloads; so if you make changes to your code base the app will live update
+13. 应用启动后，云 IDE 会出现一个显示 `todolist` 应用首页的预览窗口。
+   * 点击首页顶部的 'Todo' 返回上页的页面
+   * 服务器端会自动重新启动；所以每当你修改代码，应用就会实时更新
 
-2.   The app is a todolist manager built in Vue.js. with a Node.js backend. Play around with the App. You will notice when you add todos they appear and clear as expected. If you refresh the page your todos are persisted.
+14. 这个应用是一个基于 Vue.js 构建的待办事项管理工具，后端是 Node.js。现在可以随意体验一番应用的功能。可以看到，当添加待办事项时，就会出现在列表中；也可以清除。刷新页面后，这些待办事项还持续地存在。
 
-3.   The structure of the `todolist` is as follows.
+15. 我们的 `todolist` 应用的代码结构如下：
 ```bash
 todolist
 ├── Dockerfile
@@ -274,26 +274,26 @@ todolist
 │   └── unit
 └── vue.config.js
 ```
-where the following are the important things:
-    * `./src` is the collection of front end files. The entrypoint is the `main.js` which is used to load the root `App.vue` file.
-    * `./node_modules` is where the dependencies are stored
-    * `./test` contains our end-to-end tests and unit tests. More covered on these in later exercises.
-    * `./src/components` contains small, lightweight reusable components for our app. For example, the `NewTodo` component which encapsulates the styling, logic and data for adding a new todo to our list
-    * `./src/store` is the `vuex` files for managing application state and backend connectivity
-    * `./src/views` is the view containers; which are responsible for loading components and managing their interactions.
-    * the `./src/router.js` controls routing logic. In our case the app only has one real endpoint.
-    * `./src/scss` contains custom SCSS used in the application.
-    * `./*.js` is mostly config files for running and managing the app and the tests.
-    * `./server` is the main collection of files needed by the app. The entrypoint is the `app.js`.
-    * `./server/api` is where the API's controller, data model & unit test are stored.
-    * `./server/mocks` is a mock server used for when there is no DB access.
-    * `./server/config` stores our Express.js config, header information and other middleware.
-    * `./server/config/environment` stores environment specific config; such as connectivity to backend services like MongoDB.
-    * `./tasks` is a collection of additional `Grunt` tasks which will be used in later exercises.
-    * `Grunt` is a task runner for use with Node.js projects.
-    * `package.json` contains the dependency list and a lot of very helpful scripts for managing the app lifecycle.
+下面是一些重要的条目：
+    * `./src` 是前端文件目录。入口是在 `main.js` 文件，它用于加载根级别的 `App.vue` 文件。
+    * `./node_modules` 是存储依赖项的位置。
+    * `./test` 包含端到端测试和单元测试。将在后面的练习中详细介绍。
+    * `./src/components` 包含应用中的小型、轻量级可重用组件。例如，`NewTodo` 组件封装了向列表添加新事项的样式、逻辑和数据。
+    * `./src/store` 是用于管理应用的状态和与后端的通信的 `vuex` 文件。
+    * `./src/views` 是视图容器；负责加载组件并管理它们的交互。
+    * `./src/router.js` 控制路由逻辑。在我们的情形中，应用只有一个真实的端点（endpoint）。
+    * `./src/scss` 包含应用中使用的自定义 SCSS 文件。
+    * `./*.js` 中大部分是用于运行、管理应用及测试的配置文件。
+    * `./server` 是应用后端所需的主要文件，入口位于 `app.js` 文件。
+    * `./server/api` 是存储 API 控制器、数据模型和单元测试的位置。
+    * `./server/mocks` 是在不访问数据库时的模拟服务器。
+    * `./server/config` 存储我们的 Express.js 配置，头信息和其他中间件。
+    * `./server/config/environment` 存储与特定环境相关的配置。比如与 MongoDB 这样的后端服务的连接信息。
+    * `./tasks` 是一系列额外的 `Grunt` 任务，将在后面的练习中用到。
+    * `Grunt` 是一个用于 Node.js 项目的任务运行器。
+    * `package.json` 包含依赖列表，以及很多在管理应用生命周期过程中有用的脚本。
 
-1.  To prepare Nexus to host the binaries created by the frontend and backend builds we need to run a prepare-nexus script. Before we do this we need to export some variables and change `<YOUR_NAME>` accordingly in the below commands. This is a one time activity and would be automated in a non-training environment.
+16.   为了配置用于存储在前后端构建过程中生成的二进制文件的 Nexus 服务， 我们需要执行一个叫做 `prepare-nexus` 的脚本。在此之前，我们还需要设置一些变量，请将下面的命令中的 `<YOUR_NAME>` 对应地完成修改后再执行。这个操作只需要执行一次，且在培训环境之外的位置应该是自动的。
 
 ```bash
 oc login -u <username> -p <password> <CLUSTER_URL>
@@ -308,13 +308,13 @@ export NEXUS_SERVICE_PORT=443
 npm run prepare-nexus
 ```
 <p class="tip">
-<b>NOTE</b> - This step in a residency would be automated by a more complex nexus deployment in the ci-cd project
+<b>注意</b> - 在驻训期间，这个步骤是由 ci-cd 项目中一个更复杂的 Nexus 部署过程自动执行的。
 </p>
 
-### Part 2 - Add configs to cluster
-> _In this exercise; we will use the OpenShift Applier to drive the creation of cluster content required by the app such as MongoDB and the Apps Build / Deploy Config_
+### 二、向集群中添加配置
+> _在这个练习中，我们将使用 OpenShift Applier 工具来负责创建应用所需的集群资源，比如 MongoDB，以及应用的构建和部署配置（BuildConfig, DeploymentConfig）_
 
-1. On your terminal navigate to the root of the `todolist` application. The app contains a hidden folder called `.openshift-applier`. Move into this `.openshift-applier` directory and you should see a familiar looking directory structure for an Ansible playbook.
+1. 在你的终端环境中，切换到 `todolist` 应用的根目录。应用包含一个名为 `.openshift-applier` 的隐藏的文件夹，切换到此 `.openshift-applier` 目录，你应该能看到一个熟悉的 Ansible 剧本目录结构：
 ```
 ├── README.md
 ├── inventory
@@ -332,13 +332,13 @@ npm run prepare-nexus
     ├── todolist-build.yml
     └── todolist-deploy.yml
 ```
-with the following
-    * the `apply.yml` file is the entrypoint.
-    * the `inventory` contains the objects to populate the cluster with.
-    * the `params` contains the variables we'll apply to the `templates`
-    * the `templates` required by the app. These include the Build, Deploy configs as well as the services, health checks, and other app definitions.
+其中
+    * `apply.yml` 文件是入口
+    * `inventory` 包含用于操作集群的对象
+    * `params` 包含我们在组装模板 `templates` 时用到的变量
+    * `templates` 里的模板会在部署应用资源时用到。这些资源包括构建和部署配置（BuildConfig, DeploymentConfig），以及服务、健康检查和应用定义的其他资源。
 
-2. Before we do this we need to change `<YOUR_NAME>` accordingly in the apply.yml file.
+2. 在继续之前，我们需要将对 `apply.yml` 文件中的 `<YOUR_NAME>` 完成对应的修改。
 
 <kbd>📝 *todolist/.openshift-applier/apply.yml*</kbd>
 ```
@@ -351,10 +351,10 @@ with the following
 
 ![applier](../images/exercise2/applier.png)
 
-3. With those changes in place we can now run the playbook. First install the `openshift-applier` dependency, using the `ansible-galaxy tool` as per exercise one and then run the playbook (from the todolist directory). This will populate the cluster with all the config needed for the front end app.
+3. 完成上述修改之后，就可以运行剧本了。先安装依赖项 `openshift-applier`，然后使用练习一中用过的 `ansible-galaxy` 工具来运行剧本（运行时，确保位于 `todolist` 目录）。这个过程会在集群中创建应用前端所需的各类配置。
 
 ```bash
-# login if needed
+# 请登录，如果需要的话
 oc login -u <username> -p <password> <CLUSTER_URL>
 ```
 
@@ -367,7 +367,7 @@ ansible-playbook .openshift-applier/apply.yml -i .openshift-applier/inventory/
 
 ![ansible-success](../images/exercise2/ansible-success.png)
 
-4. Once successful, `commit` and `push` your changes to gitlab.
+4. 运行成功后，请把代码中的变更提交（`commit`）并推送（`push`）到 GitLab 中。
 ```bash
 git add .
 ```
@@ -378,33 +378,33 @@ git commit -m "UPDATE - change namespace vars to the teams"
 git push
 ```
 
-5.  Validate the build and deploy configs have been created in OpenShift by opening the console and checking `<YOUR_NAME> CI-CD builds` for the `BuildConfigs`
+5.  确保构建配置（BuildConfig）已在 OpenShift 中创建完成：打开 OpenShift 控制台，切换到 `<YOUR_NAME> CI-CD` 命名空间，并查看 `Build` 以查看构建部署（BuildConfig）。
 ![ocp-app-bc](../images/exercise2/ocp-app-bc.png)
 
-6. Check `<YOUR_NAME>-dev` to see the deployment configs are in place
+6.  切换到 `<YOUR_NAME>-dev` 命名空间，确保部署配置（DeploymentConfig）也已创建完成。
 ![ocp-app-dc](../images/exercise2/ocp-app-dc.png)
 
 
-### Part 3 - Build > Bake > Deploy
-> _In this exercise; we take what we have working locally and get it working in OpenShift_
+### 三、构建 > 烘焙 > 部署
+> _在这个练习中，基于我们在本地环境中的操作，我们让它们在 OpenShift 中运行起来_
 
-This exercise will involve creating three stages (or items) in our pipeline, each of these is detailed below at a very high level. Move on to the next step to begin implementation.
-* a *build* job is responsible for compiling and packaging our code:
-    1. Checkout from source code (`develop` for `<YOUR_NAME>-dev` & `master` for `<YOUR_NAME>-test`)
-    2. Install node dependencies and run a build / package
-    3. Send the package to Nexus
-    4. Archive the workspace to persist the workspace in case of failure
-    5. Tag the GitLab repository with the `${JOB_NAME}.${BUILD_NUMBER}` from Jenkins.
-* a *bake* job should take the package and put it in a Linux Container
-    1. Checkout the binary from Nexus and unzip its contents
-    2. Run an oc start-build of the App's BuildConfig and tag its imagestream with the provided `${BUILD_TAG}`
-* a *deploy* job should roll out the changes by updating the image tag in the DC:
-    1. Patch / set the DeploymentConfig to the image's `${BUILD_TAG}`
-    2. Rollout the changes
-    3. Verify the deployment
-* We will now go through these steps in detail.
+在这个练习中，我们要创建出流水线的三个阶段（即三个任务），下面是它们具体情况的概要介绍。后面的步骤将着手实现它们。
+* 一个*构建（build）*任务，负责对代码进行编译和打包：
+    1. 从源代码管理设施中拉取代码 (`<YOUR_NAME>-dev` 命名空间对应 `develop` 分支，而 `<YOUR_NAME>-test` 命名空间则对应 `master` 分支) 
+    2. 依赖 node 模块依赖，运行构建、打包过程
+    3. 把打好的包发送到 Nexus
+    4. 对工作空间进行持久化存档，以防运行失败状况
+    5. 使用 Jenkins 的标签 `${JOB_NAME}.${BUILD_NUMBER}` 标记当前代码库版本
+* 一个*烘焙（bake）*任务，它获取到包，并将其置于 Linux Container 容器中
+    1. 从 Nexus 获取二进制，解压缩从而获取其内容
+    2. 执行 `oc start-build` 操作以运行构建配置（BuildConfig），并以给定的标签 `${BUILD_TAG}` 标记镜像流（ImageStream）
+* 一个*部署（deploy）*任务，通过更新部署配置（DeploymentConfig）上的镜像标签，将新的变更发布出去：
+    1. 更新或设置 DeploymentConfig，令其使用上述新的镜像标签 `${BUILD_TAG}`
+    2. 发布变更版本
+    3. 验证部署结果
+* 接下来，我们进入这些步骤的细节
 
-#### 3a - Build
+#### 三a、构建
 
 1. With the BuildConfig and DeployConfig in place for both the app from previous steps; Log into Jenkins and create a `New Item`. This is just jenkins speak for a new job configuration.<br><br> ![new-item](../images/exercise2/new-item.png)
 
