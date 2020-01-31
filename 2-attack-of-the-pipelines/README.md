@@ -608,7 +608,7 @@ git push
 6. 在任务的配置页上，将分支源（Branch Sources）设置为 `git`
 ![multibranch-select-git](../images/exercise4/multibranch-select-git.png)
 
-7. 在设置中，填入 GitLab 上的 `todolist` 项目的 URL，以及按照之前的方式设置凭据 `https://gitlab.<APPS_URL>/<YOUR_NAME>/todolist.git`
+7. 在设置中，填入 GitLab 上的 `todolist` 项目的 URL，并按照之前的方式设置凭据 `https://gitlab.<APPS_URL>/<YOUR_NAME>/todolist.git`
 ![multibranch-git](../images/exercise4/multibranch-git.png)
 
 8. 将 `扫描多分支流水线触发器`（Scan Multibranch Pipeline Triggers）设置为 `由 Web 钩子扫描`（Scan by webhook），并将令牌（token）设置为 `todolist`，这也是我们在练习一开始时设置的值。它的作用是在有新变更推送到代码库时，触发任务的扫描获得新的变更。
@@ -625,20 +625,20 @@ git push
 _____
 
 ## 扩展任务
-> _Ideas for go-getters. Advanced topic for doers to get on with if they finish early. These will usually not have a solution available and are provided for additional scope._
+> _这是为积极进取的人士准备的额外加餐，为早期完成人士提供的继续挑战的话题。作为超纲范围，我们通常不为扩展任务提供解答。_
 
-- Pipeline Tasks:
-    * Add pipeline for `master` branch for each project. Use `test-` instead of `dev-` across all config and names in the pipeline.
-    * Do the `.openshift-applier` steps as part of the pipeline for greater end to end automation.
-- Promote build:
-    * Create a _promote-to-uat_ phase after the `master` branch deploy.
-    * Create a `uat` env using the OpenShift Applier as seen before.
-    * Tag and promote the image without rebuilding after the `test-**-deploy`
-- MongoDB tasks:
-    * Add MongoDB Stateful set for the UAT environment (or test).
-    * Inject MongoDB config into the Node.js app using config map & secrets.
-    * Improve the security of the DB by making the user /passwords randomly generated.
-- Setup Nexus as an `npm` mirror registry and use it in the builds to speed up the build time.
+- 流水线任务：
+    * 给每个项目的 `master` 分支创建流水线。在所有配置和名称中都用 `test-` 替换 `dev-`。
+    * 实现一个范围更广的端到端自动化流水线，在其中完成 `.openshift-applier` 步骤。
+- 发布到其他环境：
+    * 在 `master` 分支的部署过程之后，添加一个_promote-to-uat（发布到 UAT）_ 的阶段。
+    * 使用上面练习过的步骤使用 OpenShift Applier 创建 `uat` 环境。
+    * 在 `test-**-deploy` 之后，标记镜像，并且在不重新构建的情况下发布到 UAT 环境
+- MongoDB 任务：
+    * 在 UAT 环境，为 MongoDB 创建有状态副本集（Stateful Set）
+    * 使用 config map 与 secret 向 Node.js 应用注入 MongoDB 相关的配置
+    * 使用随机生成的用户名、密码提升数据库的安全性
+- 将 Nexus 设置为 `npm` 的镜像仓储，并使用它来为构建过程加速
 
 <!-- 
 ## Additional Reading
